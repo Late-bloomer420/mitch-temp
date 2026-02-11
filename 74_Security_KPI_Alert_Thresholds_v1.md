@@ -37,4 +37,5 @@ Define simple, actionable alert thresholds for pilot operations.
 
 ## Operational notes
 - Evaluate thresholds per rolling window (e.g., 15-60 min) rather than raw lifetime totals.
+- `kpi:check` behavior can be tuned with `KPI_FAIL_ON_WARNING` (default soft-fail on warnings).
 - These thresholds are pilot defaults and should be tuned with real traffic.

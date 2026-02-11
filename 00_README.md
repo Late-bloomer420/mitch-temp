@@ -99,6 +99,7 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `72_KPI_Revoked_Cache_Observability.md` - KPI counters for revoked-cache hits/stores
 - `73_Dashboard_Revoked_Cache_KPI.md` - dashboard visibility for revoked-cache counters
 - `74_Security_KPI_Alert_Thresholds_v1.md` - pilot alert thresholds for status outage and revoked-cache dependency
+- `75_KPI_Check_SoftFail_Mode.md` - warning/critical exit behavior control for KPI checks
 - `src/tools/kpiCheckCli.ts` - CLI check for KPI thresholds (`npm run kpi:check`)
 - `src/api/metrics.ts` - in-service counters for basic KPI telemetry (`GET /metrics`)
 - `src/api/eventLog.ts` + `src/api/kpi.ts` - structured audit events and derived KPI snapshot (`GET /kpi`)

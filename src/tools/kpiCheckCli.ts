@@ -3,12 +3,14 @@ import { getKpiSnapshot } from "../api/kpi";
 interface Thresholds {
   warnStatusUnavailableRate: number;
   critStatusUnavailableRate: number;
+  failOnWarning: boolean;
 }
 
 function getThresholds(): Thresholds {
   return {
     warnStatusUnavailableRate: Number(process.env.KPI_WARN_STATUS_UNAVAILABLE_RATE ?? 0.05),
     critStatusUnavailableRate: Number(process.env.KPI_CRIT_STATUS_UNAVAILABLE_RATE ?? 0.2),
+    failOnWarning: process.env.KPI_FAIL_ON_WARNING === "1",
   };
 }
 
@@ -53,7 +55,7 @@ function run(): void {
     return;
   }
 
-  if (issues.length > 0) {
+  if (issues.length > 0 && t.failOnWarning) {
     process.exitCode = 1;
   }
 }
