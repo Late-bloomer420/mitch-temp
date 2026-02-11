@@ -74,6 +74,21 @@ This backlog replaces the old concept-only framing.
 3. [ ] Add doc: "security_profile_score interpretation + limitations" with runbook actions
 4. [ ] Start native verifier adapter interface contract (strict input/output and deny mapping)
 
+## 4b) Repo-first memory discipline (while embeddings recall is blocked)
+
+### Files to keep current every batch
+- `STATE.md` (single-screen status)
+- `07_Backlog_and_Roadmap.md` (Now/Next/Later priorities)
+- `00_README.md` (index of new artifacts)
+- workspace `memory/YYYY-MM-DD.md` (short daily chronology)
+
+### End-of-batch update protocol
+1. Confirm test baseline: `npm test` + `npm run kpi:check`
+2. Update/append numbered design/security note if behavior changed
+3. Refresh `STATE.md` (last batch + next 3 actions + blockers)
+4. Refresh backlog queue ordering (keep “Now” small)
+5. Commit and push with explicit hardening intent
+
 ---
 
 ## 5) Hard guardrails (do not violate)
