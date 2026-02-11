@@ -5,6 +5,11 @@ export type CredentialStatusCheck =
 const revokedCacheById = new Map<string, number>();
 const revokedCacheByIndex = new Map<string, number>();
 
+const cacheMetrics = {
+  revokedCacheHits: 0,
+  revokedCacheStores: 0,
+};
+
 function parseRevokedIds(value?: string): Set<string> {
   return new Set(
     (value ?? "")
@@ -46,10 +51,16 @@ function isRevokedCached(credentialId: string, statusListIndex: string): boolean
 
   const now = nowMs();
   const idExpiry = credentialId ? revokedCacheById.get(credentialId) : undefined;
-  if (typeof idExpiry === "number" && idExpiry > now) return true;
+  if (typeof idExpiry === "number" && idExpiry > now) {
+    cacheMetrics.revokedCacheHits += 1;
+    return true;
+  }
 
   const idxExpiry = statusListIndex ? revokedCacheByIndex.get(statusListIndex) : undefined;
-  if (typeof idxExpiry === "number" && idxExpiry > now) return true;
+  if (typeof idxExpiry === "number" && idxExpiry > now) {
+    cacheMetrics.revokedCacheHits += 1;
+    return true;
+  }
 
   return false;
 }
@@ -61,6 +72,7 @@ function cacheRevokedSignals(credentialId: string, statusListIndex: string): voi
   const expiresAt = nowMs() + ttl;
   if (credentialId) revokedCacheById.set(credentialId, expiresAt);
   if (statusListIndex) revokedCacheByIndex.set(statusListIndex, expiresAt);
+  cacheMetrics.revokedCacheStores += 1;
 
   pruneRevokedCache(revokedCacheById);
   pruneRevokedCache(revokedCacheByIndex);
@@ -187,4 +199,11 @@ export async function checkCredentialRevocation(
   }
 
   return { ok: false, reason: "credential_status_unavailable" };
+}
+
+export function getCredentialStatusCacheMetrics(): { revoked_cache_hit_total: number; revoked_cache_store_total: number } {
+  return {
+    revoked_cache_hit_total: cacheMetrics.revokedCacheHits,
+    revoked_cache_store_total: cacheMetrics.revokedCacheStores,
+  };
 }

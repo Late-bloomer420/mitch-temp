@@ -1,4 +1,5 @@
 import { readFileSync, existsSync } from "fs";
+import { getCredentialStatusCacheMetrics } from "../proof/credentialStatus";
 
 const EVENTS_PATH = "./data/events.jsonl";
 
@@ -57,6 +58,8 @@ export function getKpiSnapshot(): Record<string, number> {
     .map((e) => e.latencyMs)
     .filter((v): v is number => typeof v === "number" && v >= 0);
 
+  const cache = getCredentialStatusCacheMetrics();
+
   return {
     decisions_total: total,
     allow_total: allows,
@@ -69,6 +72,8 @@ export function getKpiSnapshot(): Record<string, number> {
     deny_status_source_unavailable_total: denyStatusSourceUnavailable,
     deny_jurisdiction_incompatible_total: denyJurisdictionIncompatible,
     deny_status_source_unavailable_rate: denies > 0 ? denyStatusSourceUnavailable / denies : 0,
+    revoked_cache_hit_total: cache.revoked_cache_hit_total,
+    revoked_cache_store_total: cache.revoked_cache_store_total,
     latency_p50_ms: percentile(latencies, 50),
     latency_p95_ms: percentile(latencies, 95),
   };
