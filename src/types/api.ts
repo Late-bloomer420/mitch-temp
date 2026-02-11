@@ -23,6 +23,7 @@ export interface VerificationRequestV0 {
   meta?: {
     channel?: string;
     traceLevel?: "minimal" | "debug";
+    reAuthRecent?: boolean;
   };
 }
 

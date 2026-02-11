@@ -1,6 +1,6 @@
-# 21 — Deny Reason Code Catalog (Normative v0)
+# 21 - Deny Reason Code Catalog (Normative v0)
 
-Stand: 2026-02-11  
+Stand: 2026-02-11
 Purpose: single source of truth for all deny outcomes across API, engine, tests, and logs.
 
 ---
@@ -16,30 +16,31 @@ Each deny result must provide:
 ## 2) Catalog
 
 ## Schema
-- `DENY_SCHEMA_MISSING_FIELD` — required field absent
-- `DENY_SCHEMA_UNKNOWN_FIELD` — field not recognized by schema policy
-- `DENY_SCHEMA_TYPE_MISMATCH` — field type invalid
+- `DENY_SCHEMA_MISSING_FIELD` - required field absent
+- `DENY_SCHEMA_UNKNOWN_FIELD` - field not recognized by schema policy
+- `DENY_SCHEMA_TYPE_MISMATCH` - field type invalid
 
 ## Policy
-- `DENY_POLICY_UNSUPPORTED_VERSION` — policy version unknown/unsupported
-- `DENY_POLICY_UNKNOWN_PREDICATE` — predicate not recognized
-- `DENY_POLICY_MINIMIZATION_VIOLATION` — request exceeds least-disclosure rule
-- `DENY_POLICY_PURPOSE_MISMATCH` — purpose not allowed by policy
+- `DENY_POLICY_UNSUPPORTED_VERSION` - policy version unknown/unsupported
+- `DENY_POLICY_UNKNOWN_PREDICATE` - predicate not recognized
+- `DENY_POLICY_MINIMIZATION_VIOLATION` - request exceeds least-disclosure rule
+- `DENY_POLICY_PURPOSE_MISMATCH` - purpose not allowed by policy
 
 ## Binding
-- `DENY_BINDING_NONCE_REPLAY` — nonce reused or already consumed
-- `DENY_BINDING_HASH_MISMATCH` — canonical request hash mismatch
-- `DENY_BINDING_AUDIENCE_MISMATCH` — audience mismatch
-- `DENY_BINDING_EXPIRED` — expired request or outside skew window
+- `DENY_BINDING_NONCE_REPLAY` - nonce reused or already consumed
+- `DENY_BINDING_HASH_MISMATCH` - canonical request hash mismatch
+- `DENY_BINDING_AUDIENCE_MISMATCH` - audience mismatch
+- `DENY_BINDING_EXPIRED` - expired request or outside skew window
 
 ## Crypto
-- `DENY_CRYPTO_VERIFY_FAILED` — proof/signature verification failed
-- `DENY_CRYPTO_UNSUPPORTED_ALG` — algorithm not allowed
-- `DENY_CRYPTO_KEY_STATUS_INVALID` — key revoked/invalid status
+- `DENY_CRYPTO_VERIFY_FAILED` - proof/signature verification failed
+- `DENY_CRYPTO_UNSUPPORTED_ALG` - algorithm not allowed
+- `DENY_CRYPTO_KEY_STATUS_INVALID` - key revoked/invalid status
 
 ## Abuse / Platform
-- `DENY_RATE_LIMIT_EXCEEDED` — requester over quota
-- `DENY_INTERNAL_SAFE_FAILURE` — internal error handled fail-closed
+- `DENY_RATE_LIMIT_EXCEEDED` - requester over quota
+- `DENY_REAUTH_REQUIRED` - high-risk prompt frequency threshold reached; recent re-auth required
+- `DENY_INTERNAL_SAFE_FAILURE` - internal error handled fail-closed
 
 ---
 

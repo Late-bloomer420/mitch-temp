@@ -50,7 +50,16 @@
       },
       "additionalProperties": false
     },
-    "policyRef": { "type": "string", "minLength": 1 }
+    "policyRef": { "type": "string", "minLength": 1 },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "channel": { "type": "string" },
+        "traceLevel": { "enum": ["minimal", "debug"] },
+        "reAuthRecent": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    }
   },
   "additionalProperties": false
 }

@@ -5,6 +5,8 @@ import { computeRequestHash } from "../binding/requestHash";
 import { VerificationRequestV0 } from "../types/api";
 import { PolicyManifestV0 } from "../types/policy";
 import { ResolveKey } from "../proof/keyResolver";
+import { resetProofFatigue } from "../api/proofFatigue";
+import { resetRateLimiter } from "../api/rateLimiter";
 
 function b64u(buffer: Buffer): string {
   return buffer.toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
@@ -51,6 +53,9 @@ function buildRequest(): VerificationRequestV0 {
 }
 
 async function run(): Promise<void> {
+  resetRateLimiter();
+  resetProofFatigue();
+
   // 1) happy path
   const happy = await verifyRequest(buildRequest(), policy, "rp.example", resolveKey);
   assert.equal(happy.decisionCode, "ALLOW_MINIMAL_PROOF_VALID");
@@ -109,7 +114,27 @@ async function run(): Promise<void> {
   const unknownField = await verifyRequest(unknownFieldReq, policy, "rp.example", resolveKey);
   assert.equal(unknownField.decisionCode, "DENY_SCHEMA_UNKNOWN_FIELD");
 
-  // 9) rate limit burst
+  // 9) proof fatigue / re-auth required on repeated high-risk prompts
+  process.env.PROOF_FATIGUE_WINDOW_SECONDS = "3600";
+  process.env.PROOF_FATIGUE_MAX_HIGH_RISK_PROMPTS = "2";
+  process.env.HIGH_RISK_PURPOSES = "age_gate_checkout";
+
+  resetRateLimiter();
+  resetProofFatigue();
+  const hf1 = await verifyRequest(buildRequest(), policy, "rp.example", resolveKey);
+  const hf2 = await verifyRequest(buildRequest(), policy, "rp.example", resolveKey);
+  const hf3 = await verifyRequest(buildRequest(), policy, "rp.example", resolveKey);
+  assert.equal(hf1.decision, "ALLOW");
+  assert.equal(hf2.decision, "ALLOW");
+  assert.equal(hf3.decisionCode, "DENY_REAUTH_REQUIRED");
+
+  const reauthReq = buildRequest();
+  reauthReq.meta = { reAuthRecent: true };
+  const reauth = await verifyRequest(reauthReq, policy, "rp.example", resolveKey);
+  assert.equal(reauth.decision, "ALLOW");
+
+  // 10) rate limit burst
+  resetRateLimiter();
   let rateLimited = false;
   for (let i = 0; i < 20; i++) {
     const res = await verifyRequest(buildRequest(), policy, "rp.example", resolveKey);

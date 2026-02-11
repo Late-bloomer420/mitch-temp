@@ -10,6 +10,7 @@ import { checkRateLimit } from "./rateLimiter";
 import { appendReceipt } from "../receipt/wormWriter";
 import { validateRequestSemantics } from "./requestGuards";
 import { shouldFailClosedOnStatusUnavailable } from "../config/revocation";
+import { checkProofFatigue, getProofFatigueConfig } from "./proofFatigue";
 
 const nonceStore = new InMemoryNonceStore();
 
@@ -59,6 +60,10 @@ export async function verifyRequest(
       maxRequestsGlobal: Number(process.env.MAX_REQUESTS_GLOBAL ?? 100),
     });
     if (!allowed) return deny(request.requestId, "DENY_RATE_LIMIT_EXCEEDED");
+
+    // proof-fatigue gate for repeated high-risk prompts
+    const fatigue = checkProofFatigue(request, getProofFatigueConfig());
+    if (!fatigue.allowed) return deny(request.requestId, fatigue.reason ?? "DENY_REAUTH_REQUIRED");
 
     // binding gate
     const binding = await validateBinding(request, runtimeAudience, nonceStore, {
