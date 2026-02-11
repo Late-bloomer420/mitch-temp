@@ -41,4 +41,6 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `20_Canonicalization_and_Binding_Spec_v0.md` — deterministic binding + anti-replay spec
 - `21_Deny_Reason_Code_Catalog.md` — normative deny code source of truth
 - `22_Pilot_Go_NoGo_Template.md` — formal pilot decision template
+- `23_Implementation_Sequence_v0.md` — concrete build order to MVP
+- `24_Repo_Setup_and_GitHub_Linking.md` — current git/remote status + linking steps
 - `WHAT_MITCH_IS_NOT.md` — guardrails / positioning
