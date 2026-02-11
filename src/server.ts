@@ -9,6 +9,7 @@ import { envResolveKey } from "./proof/envKeyResolver";
 import { appendEvent } from "./api/eventLog";
 import { getKpiSnapshot } from "./api/kpi";
 import { recordAdjudication, recordOverride } from "./api/operations";
+import { verifyAuditChain } from "./api/auditVerify";
 
 const PORT = Number(process.env.PORT ?? 8080);
 const RUNTIME_AUDIENCE = process.env.RUNTIME_AUDIENCE ?? "rp.example";
@@ -88,7 +89,7 @@ const server = createServer(async (req, res) => {
       200,
       {
         service: "miTch verifier",
-        endpoints: ["GET /", "GET /health", "GET /dashboard", "GET /metrics", "GET /metrics.csv", "GET /kpi", "GET /metrics/reset (ALLOW_DEV_RESET=1)", "GET /test-request (LOCAL_TEST_KEYS=1)", "POST /verify", "POST /override", "POST /adjudicate"],
+        endpoints: ["GET /", "GET /health", "GET /dashboard", "GET /metrics", "GET /metrics.csv", "GET /kpi", "GET /audit/verify", "GET /metrics/reset (ALLOW_DEV_RESET=1)", "GET /test-request (LOCAL_TEST_KEYS=1)", "POST /verify", "POST /override", "POST /adjudicate"],
       },
       correlationId
     );
@@ -135,6 +136,11 @@ const server = createServer(async (req, res) => {
   if (req.method === "GET" && req.url === "/kpi") {
     if (!ALLOW_METRICS) return sendJson(res, 404, { error: "not_found" }, correlationId);
     return sendJson(res, 200, getKpiSnapshot(), correlationId);
+  }
+
+  if (req.method === "GET" && req.url === "/audit/verify") {
+    if (!ALLOW_METRICS) return sendJson(res, 404, { error: "not_found" }, correlationId);
+    return sendJson(res, 200, verifyAuditChain(), correlationId);
   }
 
   if (req.method === "GET" && req.url === "/metrics/reset") {

@@ -63,6 +63,7 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `42_Pilot_Critical_Config.md` — required env config for protected pilot operation
 - `src/api/metrics.ts` — in-service counters for basic KPI telemetry (`GET /metrics`)
 - `src/api/eventLog.ts` + `src/api/kpi.ts` — structured audit events and derived KPI snapshot (`GET /kpi`)
+- `src/api/auditVerify.ts` — audit hash-chain integrity verification (`GET /audit/verify`)
 - `LICENSE` — MIT open-source license
 - `NOTICE` — ownership and positioning notice
 - `CODEOWNERS` — default review ownership
