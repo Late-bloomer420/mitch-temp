@@ -78,6 +78,8 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `52_RP_First_Success_Examples.md` — copy/paste first-success and failure examples
 - `53_TEE_Readiness_Gap.md` — explicit gap analysis for true TEE-backed policy execution
 - `54_External_Security_Findings_Integration.md` — mapped action plan from external security review
+- `55_External_Findings_Expanded_Systemic_Risks.md` — integrated systemic/scale/governance findings from expanded review
+- `56_Risk_to_Roadmap_Mapping.md` — concrete owner/phase mapping for newly tracked risks
 - `src/api/metrics.ts` — in-service counters for basic KPI telemetry (`GET /metrics`)
 - `src/api/eventLog.ts` + `src/api/kpi.ts` — structured audit events and derived KPI snapshot (`GET /kpi`)
 - `src/api/auditVerify.ts` — audit hash-chain integrity verification (`GET /audit/verify`)
