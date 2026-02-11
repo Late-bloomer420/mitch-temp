@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "compile": "tsc",
-    "test": "echo 'Tests pending Phase 0 completion'"
+    "test": "npm run compile && node dist/tests/core.js"
   },
   "keywords": [
     "privacy",

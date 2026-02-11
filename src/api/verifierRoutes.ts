@@ -4,6 +4,7 @@ import { InMemoryNonceStore } from "../binding/nonceStore";
 import { validateBinding } from "../binding/validateBinding";
 import { evaluatePolicy } from "../policy/evaluator";
 import { verifyProofBundle } from "../proof/verifier";
+import { ResolveKey } from "../proof/keyResolver";
 
 const nonceStore = new InMemoryNonceStore();
 
@@ -26,7 +27,8 @@ function deny(requestId: string, decisionCode: string): VerificationResponseV0 {
 export async function verifyRequest(
   request: VerificationRequestV0,
   policy: PolicyManifestV0,
-  runtimeAudience: string
+  runtimeAudience: string,
+  resolveKey: ResolveKey
 ): Promise<VerificationResponseV0> {
   try {
     // binding gate
@@ -42,12 +44,11 @@ export async function verifyRequest(
     if (decision.decision === "DENY") return deny(request.requestId, decision.decisionCode);
 
     // crypto verify gate (MVP stub wired in)
-    const crypto = verifyProofBundle(request.proofBundle);
+    const crypto = await verifyProofBundle(request.proofBundle, request.binding.requestHash, resolveKey);
     if (!crypto.ok) {
-      const code = crypto.reason === "unsupported_alg"
-        ? "DENY_CRYPTO_UNSUPPORTED_ALG"
-        : "DENY_CRYPTO_VERIFY_FAILED";
-      return deny(request.requestId, code);
+      if (crypto.reason === "unsupported_alg") return deny(request.requestId, "DENY_CRYPTO_UNSUPPORTED_ALG");
+      if (crypto.reason === "revoked_key") return deny(request.requestId, "DENY_CRYPTO_KEY_STATUS_INVALID");
+      return deny(request.requestId, "DENY_CRYPTO_VERIFY_FAILED");
     }
 
     return {

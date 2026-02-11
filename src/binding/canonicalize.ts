@@ -15,12 +15,19 @@ function normalize(value: unknown): unknown {
 }
 
 export function canonicalPayload(request: VerificationRequestV0): Record<string, unknown> {
-  const { binding, ...rest } = request;
   return normalize({
-    ...rest,
+    version: request.version,
+    requestId: request.requestId,
+    rp: {
+      id: request.rp.id,
+      audience: request.rp.audience,
+    },
+    purpose: request.purpose,
+    claims: request.claims,
+    policyRef: request.policyRef,
     binding: {
-      nonce: binding.nonce,
-      expiresAt: binding.expiresAt,
+      nonce: request.binding.nonce,
+      expiresAt: request.binding.expiresAt,
     },
   }) as Record<string, unknown>;
 }
