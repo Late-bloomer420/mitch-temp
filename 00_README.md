@@ -82,6 +82,8 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `56_Risk_to_Roadmap_Mapping.md` — concrete owner/phase mapping for newly tracked risks
 - `57_Proof_Fatigue_Control_v1.md` — implemented baseline control for repeated high-risk prompt abuse
 - `58_Revocation_Baseline_v1.md` — credential/key revocation baseline and next-step plan
+- `59_Supply_Chain_Hardening_v1.md` — baseline + near-term controls against dependency compromise
+- `60_Legal_and_Jurisdiction_Security_Strategy.md` — backdoor pressure and jurisdiction conflict strategy
 - `src/api/metrics.ts` — in-service counters for basic KPI telemetry (`GET /metrics`)
 - `src/api/eventLog.ts` + `src/api/kpi.ts` — structured audit events and derived KPI snapshot (`GET /kpi`)
 - `src/api/auditVerify.ts` — audit hash-chain integrity verification (`GET /audit/verify`)
