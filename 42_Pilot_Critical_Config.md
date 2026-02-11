@@ -13,6 +13,10 @@ Clients must send:
 ## Runtime audience
 - `RUNTIME_AUDIENCE=rp.example`
 
+## Crypto agility baseline
+- `ALLOWED_ALGS=EdDSA` (comma-separated allowlist)
+- Keep this explicit so algorithm migrations are controlled and auditable.
+
 ## Key resolver for non-local mode
 - `LOCAL_TEST_KEYS=0`
 - `KEY_SOURCE_MODE=env|file|http`

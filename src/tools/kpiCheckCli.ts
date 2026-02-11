@@ -87,6 +87,7 @@ function run(): void {
   }
 
   const estimatedCostPerVerification = Number(kpi.estimated_cost_per_verification_eur ?? 0);
+  const cryptoAllowedAlgsCount = Number(kpi.crypto_allowed_algs_count ?? 0);
   const estimatedMonthlyRunCost = Number(kpi.estimated_monthly_run_cost_eur ?? 0);
 
   const output = {
@@ -103,6 +104,7 @@ function run(): void {
       resolver_quorum_failures_total: resolverQuorumFailures,
       resolver_inconsistent_responses_total: resolverInconsistent,
       estimated_cost_per_verification_eur: estimatedCostPerVerification,
+      crypto_allowed_algs_count: cryptoAllowedAlgsCount,
       estimated_monthly_run_cost_eur: estimatedMonthlyRunCost,
     },
     issues,

@@ -66,6 +66,10 @@ export function getKpiSnapshot(): Record<string, number> {
   const resolver = getResolverTelemetry();
 
   const estimatedCostPerVerification = Number(process.env.ESTIMATED_COST_PER_VERIFICATION_EUR ?? 0.002);
+  const allowedAlgsCount = (process.env.ALLOWED_ALGS ?? "EdDSA")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean).length;
   const estimatedFixedMonthlyCost = Number(process.env.ESTIMATED_FIXED_MONTHLY_COST_EUR ?? 0);
   const estimatedMonthlyVerificationVolume = Number(process.env.ESTIMATED_MONTHLY_VERIFICATION_VOLUME ?? total);
   const estimatedMonthlyRunCost =
@@ -92,6 +96,7 @@ export function getKpiSnapshot(): Record<string, number> {
     resolver_quorum_failures_total: resolver.resolver_quorum_failures_total,
     resolver_inconsistent_responses_total: resolver.resolver_inconsistent_responses_total,
     estimated_cost_per_verification_eur: estimatedCostPerVerification,
+    crypto_allowed_algs_count: allowedAlgsCount,
     estimated_monthly_verification_volume: Math.max(0, estimatedMonthlyVerificationVolume),
     estimated_fixed_monthly_cost_eur: estimatedFixedMonthlyCost,
     estimated_monthly_run_cost_eur: estimatedMonthlyRunCost,

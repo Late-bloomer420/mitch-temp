@@ -3,7 +3,14 @@ import { ProofBundleV0 } from "../types/api";
 import { ResolveKey } from "./keyResolver";
 import { checkCredentialRevocation } from "./credentialStatus";
 
-const ALLOWED_ALGS = new Set(["EdDSA"]);
+function getAllowedAlgs(): Set<string> {
+  return new Set(
+    (process.env.ALLOWED_ALGS ?? "EdDSA")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean)
+  );
+}
 
 function base64UrlToBuffer(input: string): Buffer {
   const b64 = input.replace(/-/g, "+").replace(/_/g, "/");
@@ -18,7 +25,8 @@ export async function verifyProofBundle(
 ): Promise<{ ok: boolean; reason?: string }> {
   if (!bundle || typeof bundle !== "object") return { ok: false, reason: "missing_bundle" };
   if (!bundle.proof || bundle.proof.trim().length === 0) return { ok: false, reason: "empty_proof" };
-  if (!bundle.alg || !ALLOWED_ALGS.has(bundle.alg)) return { ok: false, reason: "unsupported_alg" };
+  const allowedAlgs = getAllowedAlgs();
+  if (!bundle.alg || !allowedAlgs.has(bundle.alg)) return { ok: false, reason: "unsupported_alg" };
 
   const credentialStatus = await checkCredentialRevocation(bundle.credentialId, bundle.credentialStatus);
   if (!credentialStatus.ok) return { ok: false, reason: credentialStatus.reason };
