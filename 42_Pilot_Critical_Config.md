@@ -4,6 +4,9 @@
 - `AUTH_TOKEN_REQUIRED=1`
 - `AUTH_TOKEN=<strong-random-token>`
 
+Optional for token rotation window:
+- `AUTH_TOKEN_NEXT=<new-token-during-rollover>`
+
 Clients must send:
 - `Authorization: Bearer <token>`
 
