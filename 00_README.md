@@ -49,4 +49,6 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `28_Test_Vector_Pack_v0.md` — canonicalization/binding normative vectors
 - `29_Implementation_Scaffold.md` — target module/file structure for coding phase
 - `30_First_Code_Tasks.md` — immediate implementation backlog (top 10)
+- `31_Interface_Definitions_v0.md` — internal contracts for parallel implementation
+- `32_Config_Profile_v0.md` — safe runtime defaults and config shape
 - `WHAT_MITCH_IS_NOT.md` — guardrails / positioning
