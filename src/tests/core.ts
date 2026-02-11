@@ -137,7 +137,17 @@ async function run(): Promise<void> {
   delete process.env.REQUIRE_JURISDICTION_MATCH;
   delete process.env.RUNTIME_JURISDICTION;
 
-  // 9) unknown schema field
+  // 9) malformed StatusList2021 shape in request schema
+  const malformedStatusReq = buildRequest();
+  malformedStatusReq.proofBundle.credentialStatus = {
+    type: "StatusList2021Entry",
+    statusListCredential: "https://status.example/list/1",
+    // missing statusListIndex
+  } as unknown as VerificationRequestV0["proofBundle"]["credentialStatus"];
+  const malformedStatusRes = await verifyRequest(malformedStatusReq, policy, "rp.example", resolveKey);
+  assert.equal(malformedStatusRes.decisionCode, "DENY_STATUS_SOURCE_UNAVAILABLE");
+
+  // 10) unknown schema field
   const unknownFieldReq = {
     ...buildRequest(),
     sneaky: true,

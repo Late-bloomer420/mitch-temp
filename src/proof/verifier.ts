@@ -20,7 +20,7 @@ export async function verifyProofBundle(
   if (!bundle.proof || bundle.proof.trim().length === 0) return { ok: false, reason: "empty_proof" };
   if (!bundle.alg || !ALLOWED_ALGS.has(bundle.alg)) return { ok: false, reason: "unsupported_alg" };
 
-  const credentialStatus = await checkCredentialRevocation(bundle.credentialId);
+  const credentialStatus = await checkCredentialRevocation(bundle.credentialId, bundle.credentialStatus);
   if (!credentialStatus.ok) return { ok: false, reason: credentialStatus.reason };
   if (credentialStatus.revoked) return { ok: false, reason: "revoked_credential" };
 

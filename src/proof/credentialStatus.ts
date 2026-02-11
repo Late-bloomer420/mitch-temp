@@ -34,22 +34,40 @@ async function checkHttpStatus(credentialId: string): Promise<CredentialStatusCh
   }
 }
 
-export async function checkCredentialRevocation(credentialId?: string): Promise<CredentialStatusCheck> {
-  if (!credentialId) return { ok: true, revoked: false };
+export async function checkCredentialRevocation(
+  credentialId?: string,
+  credentialStatus?: { type?: string; statusListCredential?: string; statusListIndex?: string }
+): Promise<CredentialStatusCheck> {
+  if (!credentialId && !credentialStatus) return { ok: true, revoked: false };
+
+  // StatusList2021 shape scaffold (validation/transport readiness)
+  if (credentialStatus) {
+    if (
+      credentialStatus.type !== "StatusList2021Entry" ||
+      !credentialStatus.statusListCredential ||
+      !credentialStatus.statusListIndex
+    ) {
+      return { ok: false, reason: "credential_status_unavailable" };
+    }
+  }
 
   const mode = (process.env.CREDENTIAL_STATUS_MODE ?? "env").trim().toLowerCase();
+
+  const effectiveCredentialId = credentialId ?? "";
 
   // baseline env mode
   const envRevoked = parseRevokedIds(process.env.REVOKED_CREDENTIAL_IDS);
   if (mode === "env") {
-    return { ok: true, revoked: envRevoked.has(credentialId) };
+    if (!effectiveCredentialId) return { ok: true, revoked: false };
+    return { ok: true, revoked: envRevoked.has(effectiveCredentialId) };
   }
 
   // optional http mode scaffold
   if (mode === "http") {
+    if (!effectiveCredentialId) return { ok: false, reason: "credential_status_unavailable" };
     // local list still applies as immediate deny list
-    if (envRevoked.has(credentialId)) return { ok: true, revoked: true };
-    return checkHttpStatus(credentialId);
+    if (envRevoked.has(effectiveCredentialId)) return { ok: true, revoked: true };
+    return checkHttpStatus(effectiveCredentialId);
   }
 
   return { ok: false, reason: "credential_status_unavailable" };

@@ -38,6 +38,16 @@
         "disclosures": { "type": "array", "items": { "type": "string" } },
         "keyId": { "type": "string" },
         "credentialId": { "type": "string" },
+        "credentialStatus": {
+          "type": "object",
+          "required": ["type", "statusListCredential", "statusListIndex"],
+          "properties": {
+            "type": { "const": "StatusList2021Entry" },
+            "statusListCredential": { "type": "string", "minLength": 1 },
+            "statusListIndex": { "type": "string", "minLength": 1 }
+          },
+          "additionalProperties": false
+        },
         "alg": { "type": "string", "minLength": 1 }
       },
       "additionalProperties": false

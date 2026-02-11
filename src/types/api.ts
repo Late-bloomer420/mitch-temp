@@ -46,5 +46,10 @@ export interface ProofBundleV0 {
   disclosures?: string[];
   keyId?: string;
   credentialId?: string;
+  credentialStatus?: {
+    type: "StatusList2021Entry";
+    statusListCredential: string;
+    statusListIndex: string;
+  };
   alg?: string;
 }
