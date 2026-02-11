@@ -115,6 +115,18 @@ async function run(): Promise<void> {
   assert.equal(revokedCred.decisionCode, "DENY_CRYPTO_KEY_STATUS_INVALID");
   delete process.env.REVOKED_CREDENTIAL_IDS;
 
+  // 7e) credential status provider unavailable (http mode)
+  process.env.CREDENTIAL_STATUS_MODE = "http";
+  process.env.CREDENTIAL_STATUS_URL = "http://127.0.0.1:9/revoked";
+  process.env.CREDENTIAL_STATUS_TIMEOUT_MS = "10";
+  const statusUnavailableReq = buildRequest();
+  statusUnavailableReq.proofBundle.credentialId = "cred-check-1";
+  const statusUnavailableRes = await verifyRequest(statusUnavailableReq, policy, "rp.example", resolveKey);
+  assert.equal(statusUnavailableRes.decisionCode, "DENY_CRYPTO_KEY_STATUS_INVALID");
+  delete process.env.CREDENTIAL_STATUS_MODE;
+  delete process.env.CREDENTIAL_STATUS_URL;
+  delete process.env.CREDENTIAL_STATUS_TIMEOUT_MS;
+
   // 8) jurisdiction incompatibility
   process.env.REQUIRE_JURISDICTION_MATCH = "1";
   process.env.RUNTIME_JURISDICTION = "EU";

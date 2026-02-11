@@ -1,17 +1,9 @@
 import { verify } from "crypto";
 import { ProofBundleV0 } from "../types/api";
 import { ResolveKey } from "./keyResolver";
+import { checkCredentialRevocation } from "./credentialStatus";
 
 const ALLOWED_ALGS = new Set(["EdDSA"]);
-
-function isRevokedCredential(credentialId?: string): boolean {
-  if (!credentialId) return false;
-  return (process.env.REVOKED_CREDENTIAL_IDS ?? "")
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean)
-    .includes(credentialId);
-}
 
 function base64UrlToBuffer(input: string): Buffer {
   const b64 = input.replace(/-/g, "+").replace(/_/g, "/");
@@ -28,7 +20,9 @@ export async function verifyProofBundle(
   if (!bundle.proof || bundle.proof.trim().length === 0) return { ok: false, reason: "empty_proof" };
   if (!bundle.alg || !ALLOWED_ALGS.has(bundle.alg)) return { ok: false, reason: "unsupported_alg" };
 
-  if (isRevokedCredential(bundle.credentialId)) return { ok: false, reason: "revoked_credential" };
+  const credentialStatus = await checkCredentialRevocation(bundle.credentialId);
+  if (!credentialStatus.ok) return { ok: false, reason: credentialStatus.reason };
+  if (credentialStatus.revoked) return { ok: false, reason: "revoked_credential" };
 
   const key = await resolveKey(bundle.keyId);
   if (key.status === "revoked") return { ok: false, reason: "revoked_key" };

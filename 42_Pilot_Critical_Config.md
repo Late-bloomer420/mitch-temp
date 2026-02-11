@@ -31,6 +31,11 @@ Optional revoked lists:
 - `REVOKED_KEY_IDS=kid-2,kid-3`
 - `REVOKED_CREDENTIAL_IDS=cred-1,cred-2`
 
+Credential status resolver mode:
+- `CREDENTIAL_STATUS_MODE=env|http` (default: `env`)
+- `CREDENTIAL_STATUS_URL=http://status-provider.local/credentials/revoked` (http mode)
+- `CREDENTIAL_STATUS_TIMEOUT_MS=1500`
+
 Operational behavior notes:
 - missing/revoked/status-unavailable keys are deny-biased for high-risk purposes.
 - keep key source timeout low (e.g., `KEY_SOURCE_TIMEOUT_MS=1500`) to avoid hanging verifier paths.
