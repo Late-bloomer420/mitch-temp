@@ -13,6 +13,7 @@ export interface VerificationRequestV0 {
   };
   purpose: string;
   claims: VerificationClaim[];
+  proofBundle: ProofBundleV0;
   binding: {
     nonce: string;
     requestHash: string;

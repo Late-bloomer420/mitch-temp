@@ -3,6 +3,7 @@ import { PolicyManifestV0 } from "../types/policy";
 import { InMemoryNonceStore } from "../binding/nonceStore";
 import { validateBinding } from "../binding/validateBinding";
 import { evaluatePolicy } from "../policy/evaluator";
+import { verifyProofBundle } from "../proof/verifier";
 
 const nonceStore = new InMemoryNonceStore();
 
@@ -40,9 +41,14 @@ export async function verifyRequest(
     const decision = evaluatePolicy(request, policy);
     if (decision.decision === "DENY") return deny(request.requestId, decision.decisionCode);
 
-    // crypto verify placeholder for next task
-    const cryptoOk = true;
-    if (!cryptoOk) return deny(request.requestId, "DENY_CRYPTO_VERIFY_FAILED");
+    // crypto verify gate (MVP stub wired in)
+    const crypto = verifyProofBundle(request.proofBundle);
+    if (!crypto.ok) {
+      const code = crypto.reason === "unsupported_alg"
+        ? "DENY_CRYPTO_UNSUPPORTED_ALG"
+        : "DENY_CRYPTO_VERIFY_FAILED";
+      return deny(request.requestId, code);
+    }
 
     return {
       version: "v0",

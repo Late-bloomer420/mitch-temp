@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "required": ["version", "requestId", "rp", "purpose", "claims", "binding", "policyRef"],
+  "required": ["version", "requestId", "rp", "purpose", "claims", "proofBundle", "binding", "policyRef"],
   "properties": {
     "version": { "const": "v0" },
     "requestId": { "type": "string", "minLength": 1 },
@@ -27,6 +27,18 @@
         },
         "additionalProperties": false
       }
+    },
+    "proofBundle": {
+      "type": "object",
+      "required": ["format", "proof", "alg"],
+      "properties": {
+        "format": { "type": "string", "minLength": 1 },
+        "proof": { "type": "string", "minLength": 1 },
+        "disclosures": { "type": "array", "items": { "type": "string" } },
+        "keyId": { "type": "string" },
+        "alg": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
     },
     "binding": {
       "type": "object",
