@@ -84,7 +84,13 @@ const server = createServer(async (req, res) => {
 
   if (req.method === "GET" && req.url === "/dashboard") {
     const m = getMetricsSnapshot();
-    const html = `<!doctype html><html><head><meta charset="utf-8"><title>miTch Dashboard</title></head><body style="font-family:Arial;max-width:760px;margin:2rem auto;line-height:1.4">
+    const recentRows = m.recentDecisions
+      .map(
+        (d) => `<tr><td>${d.at}</td><td>${d.requestId}</td><td>${d.decision}</td><td>${d.decisionCode}</td></tr>`
+      )
+      .join("");
+
+    const html = `<!doctype html><html><head><meta charset="utf-8"><title>miTch Dashboard</title></head><body style="font-family:Arial;max-width:920px;margin:2rem auto;line-height:1.4">
 <h1>miTch Local Dashboard</h1>
 <p><b>Started:</b> ${m.startedAt}</p>
 <ul>
@@ -94,6 +100,11 @@ const server = createServer(async (req, res) => {
 </ul>
 <h3>Deny by Code</h3>
 <pre>${JSON.stringify(m.denyByCode, null, 2)}</pre>
+<h3>Recent Decisions (last 10)</h3>
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%">
+<thead><tr><th>Time</th><th>Request ID</th><th>Decision</th><th>Code</th></tr></thead>
+<tbody>${recentRows || "<tr><td colspan='4'><i>No decisions yet</i></td></tr>"}</tbody>
+</table>
 <p><a href="/metrics">/metrics (JSON)</a> | <a href="/metrics.csv">/metrics.csv</a></p>
 </body></html>`;
     return sendHtml(res, 200, html, correlationId);
@@ -136,7 +147,7 @@ const server = createServer(async (req, res) => {
       const parsed: unknown = raw ? JSON.parse(raw) : {};
 
       const result = await verifyRequest(parsed, defaultPolicy, RUNTIME_AUDIENCE, resolveKey);
-      recordDecision(result.decision, result.decisionCode);
+      recordDecision(result.decision, result.decisionCode, result.requestId);
       const status = result.decision === "ALLOW" ? 200 : 403;
       return sendJson(res, status, result, correlationId);
     } catch {
