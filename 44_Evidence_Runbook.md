@@ -27,7 +27,11 @@ Creates a timestamped folder under `data/evidence/<timestamp>/`.
 JSON summary printed to console (can be copied into weekly KPI report).
 
 ## KPI threshold check (recommended)
-After evidence export, capture current `/kpi` and compare key signals against:
+After evidence export, run:
+```powershell
+npm run kpi:check
+```
+Threshold defaults are aligned with:
 - `74_Security_KPI_Alert_Thresholds_v1.md`
 
 Minimum check set:

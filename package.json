@@ -10,6 +10,7 @@
     "evidence:export": "npm run compile && node dist/tests/evidenceExport.js",
     "swarm:test": "npm run compile && node dist/tests/swarmAttack.js",
     "security:deps": "npm audit --audit-level=high",
+    "kpi:check": "npm run compile && node dist/tools/kpiCheckCli.js",
     "adjudicate": "npm run compile && node dist/tools/adjudicateCli.js",
     "start": "node dist/server.js",
     "dev": "npm run compile && node dist/server.js"
