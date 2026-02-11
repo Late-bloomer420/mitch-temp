@@ -23,9 +23,24 @@ async function checkHttpStatus(
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    const res = await fetch(url, { signal: controller.signal });
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: { Accept: "application/json" },
+    });
     if (!res.ok) return { ok: false, reason: "credential_status_unavailable" };
-    const data = (await res.json()) as { revokedCredentialIds?: string[]; revokedIndexes?: Array<string | number> };
+    const data = (await res.json()) as { revokedCredentialIds?: unknown; revokedIndexes?: unknown };
+
+    const hasRevokedIds = Object.prototype.hasOwnProperty.call(data, "revokedCredentialIds");
+    const hasRevokedIndexes = Object.prototype.hasOwnProperty.call(data, "revokedIndexes");
+    if (!hasRevokedIds && !hasRevokedIndexes) return { ok: false, reason: "credential_status_unavailable" };
+
+    if (hasRevokedIds && !Array.isArray(data.revokedCredentialIds)) {
+      return { ok: false, reason: "credential_status_unavailable" };
+    }
+    if (hasRevokedIndexes && !Array.isArray(data.revokedIndexes)) {
+      return { ok: false, reason: "credential_status_unavailable" };
+    }
+
     const revokedIds = Array.isArray(data.revokedCredentialIds)
       ? new Set(data.revokedCredentialIds.map((s) => String(s).trim()).filter(Boolean))
       : new Set<string>();

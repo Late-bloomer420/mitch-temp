@@ -94,6 +94,7 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `67_Strong_ReAuth_Scaffold_v1.md` — strict re-auth/WebAuthn hook for proof-fatigue bypass hardening
 - `68_StatusList2021_Input_Shape_Scaffold.md` — request/schema readiness for StatusList2021 credential status metadata
 - `69_StatusList2021_Index_Check_Light.md` — light index-based revocation checks (env/http)
+- `70_Status_Source_Response_Hardening.md` — fail-closed validation for status-provider response shape
 - `src/api/metrics.ts` — in-service counters for basic KPI telemetry (`GET /metrics`)
 - `src/api/eventLog.ts` + `src/api/kpi.ts` — structured audit events and derived KPI snapshot (`GET /kpi`)
 - `src/api/auditVerify.ts` — audit hash-chain integrity verification (`GET /audit/verify`)

@@ -1,4 +1,5 @@
 import assert from "assert";
+import { createServer } from "http";
 import { generateKeyPairSync, sign } from "crypto";
 import { verifyRequest } from "../api/verifierRoutes";
 import { computeRequestHash } from "../binding/requestHash";
@@ -123,6 +124,25 @@ async function run(): Promise<void> {
   statusUnavailableReq.proofBundle.credentialId = "cred-check-1";
   const statusUnavailableRes = await verifyRequest(statusUnavailableReq, policy, "rp.example", resolveKey);
   assert.equal(statusUnavailableRes.decisionCode, "DENY_STATUS_SOURCE_UNAVAILABLE");
+  delete process.env.CREDENTIAL_STATUS_MODE;
+  delete process.env.CREDENTIAL_STATUS_URL;
+  delete process.env.CREDENTIAL_STATUS_TIMEOUT_MS;
+
+  // 7f) malformed credential status payload (http mode)
+  const malformedStatusServer = createServer((_, res) => {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ unexpected: true }));
+  });
+  await new Promise<void>((resolve) => malformedStatusServer.listen(18081, resolve));
+
+  process.env.CREDENTIAL_STATUS_MODE = "http";
+  process.env.CREDENTIAL_STATUS_URL = "http://127.0.0.1:18081/revoked";
+  process.env.CREDENTIAL_STATUS_TIMEOUT_MS = "200";
+  const malformedProviderReq = buildRequest();
+  malformedProviderReq.proofBundle.credentialId = "cred-check-2";
+  const malformedProviderRes = await verifyRequest(malformedProviderReq, policy, "rp.example", resolveKey);
+  assert.equal(malformedProviderRes.decisionCode, "DENY_STATUS_SOURCE_UNAVAILABLE");
+  await new Promise<void>((resolve, reject) => malformedStatusServer.close((err) => (err ? reject(err) : resolve())));
   delete process.env.CREDENTIAL_STATUS_MODE;
   delete process.env.CREDENTIAL_STATUS_URL;
   delete process.env.CREDENTIAL_STATUS_TIMEOUT_MS;
