@@ -65,6 +65,12 @@ export function getKpiSnapshot(): Record<string, number> {
   const cache = getCredentialStatusCacheMetrics();
   const resolver = getResolverTelemetry();
 
+  const estimatedCostPerVerification = Number(process.env.ESTIMATED_COST_PER_VERIFICATION_EUR ?? 0.002);
+  const estimatedFixedMonthlyCost = Number(process.env.ESTIMATED_FIXED_MONTHLY_COST_EUR ?? 0);
+  const estimatedMonthlyVerificationVolume = Number(process.env.ESTIMATED_MONTHLY_VERIFICATION_VOLUME ?? total);
+  const estimatedMonthlyRunCost =
+    estimatedFixedMonthlyCost + estimatedCostPerVerification * Math.max(0, estimatedMonthlyVerificationVolume);
+
   return {
     decisions_total: total,
     allow_total: allows,
@@ -85,6 +91,10 @@ export function getKpiSnapshot(): Record<string, number> {
     resolver_queries_total: resolver.resolver_queries_total,
     resolver_quorum_failures_total: resolver.resolver_quorum_failures_total,
     resolver_inconsistent_responses_total: resolver.resolver_inconsistent_responses_total,
+    estimated_cost_per_verification_eur: estimatedCostPerVerification,
+    estimated_monthly_verification_volume: Math.max(0, estimatedMonthlyVerificationVolume),
+    estimated_fixed_monthly_cost_eur: estimatedFixedMonthlyCost,
+    estimated_monthly_run_cost_eur: estimatedMonthlyRunCost,
     latency_p50_ms: percentile(latencies, 50),
     latency_p95_ms: percentile(latencies, 95),
   };

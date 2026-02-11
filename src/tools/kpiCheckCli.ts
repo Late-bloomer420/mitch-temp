@@ -86,6 +86,9 @@ function run(): void {
     );
   }
 
+  const estimatedCostPerVerification = Number(kpi.estimated_cost_per_verification_eur ?? 0);
+  const estimatedMonthlyRunCost = Number(kpi.estimated_monthly_run_cost_eur ?? 0);
+
   const output = {
     checkedAt: new Date().toISOString(),
     thresholds: t,
@@ -99,6 +102,8 @@ function run(): void {
       deny_resolver_quorum_failed_total: denyResolverQuorumFailed,
       resolver_quorum_failures_total: resolverQuorumFailures,
       resolver_inconsistent_responses_total: resolverInconsistent,
+      estimated_cost_per_verification_eur: estimatedCostPerVerification,
+      estimated_monthly_run_cost_eur: estimatedMonthlyRunCost,
     },
     issues,
     ok: issues.length === 0,

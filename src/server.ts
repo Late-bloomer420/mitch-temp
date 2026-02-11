@@ -134,6 +134,13 @@ const server = createServer(async (req, res) => {
 <li><b>resolver_quorum_failures_total:</b> ${k.resolver_quorum_failures_total ?? 0}</li>
 <li><b>resolver_inconsistent_responses_total:</b> ${k.resolver_inconsistent_responses_total ?? 0}</li>
 </ul>
+<h3>Estimated Cost KPI</h3>
+<ul>
+<li><b>estimated_cost_per_verification_eur:</b> ${k.estimated_cost_per_verification_eur ?? 0}</li>
+<li><b>estimated_monthly_verification_volume:</b> ${k.estimated_monthly_verification_volume ?? 0}</li>
+<li><b>estimated_fixed_monthly_cost_eur:</b> ${k.estimated_fixed_monthly_cost_eur ?? 0}</li>
+<li><b>estimated_monthly_run_cost_eur:</b> ${k.estimated_monthly_run_cost_eur ?? 0}</li>
+</ul>
 <h3>Recent Decisions (last 10)</h3>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%">
 <thead><tr><th>Time</th><th>Request ID</th><th>Decision</th><th>Code</th></tr></thead>

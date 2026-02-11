@@ -72,6 +72,11 @@ Optional strong re-auth scaffold (WebAuthn integration hook):
 - `RUNTIME_JURISDICTION=EU`
 - requests should include `rp.jurisdiction` (e.g., `EU`) when strict mode is active.
 
+## Cost KPI estimation inputs
+- `ESTIMATED_COST_PER_VERIFICATION_EUR=0.002`
+- `ESTIMATED_FIXED_MONTHLY_COST_EUR=0`
+- `ESTIMATED_MONTHLY_VERIFICATION_VOLUME=10000`
+
 ## Safety defaults
 - `NODE_ENV=production` to disable dashboard/test endpoints
 - `ALLOW_METRICS=1` only if metrics endpoint is explicitly desired
