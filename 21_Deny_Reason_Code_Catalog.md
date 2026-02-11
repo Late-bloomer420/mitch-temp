@@ -40,6 +40,7 @@ Each deny result must provide:
 ## Abuse / Platform
 - `DENY_RATE_LIMIT_EXCEEDED` - requester over quota
 - `DENY_REAUTH_REQUIRED` - high-risk prompt frequency threshold reached; recent re-auth required
+- `DENY_JURISDICTION_INCOMPATIBLE` - requester/runtime jurisdiction mismatch or missing jurisdiction when strict matching is enabled
 - `DENY_INTERNAL_SAFE_FAILURE` - internal error handled fail-closed
 
 ---

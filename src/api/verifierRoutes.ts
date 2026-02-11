@@ -53,6 +53,15 @@ export async function verifyRequest(
     const sem = validateRequestSemantics(request);
     if (!sem.ok) return deny(request.requestId, sem.code);
 
+    // optional jurisdiction compatibility gate
+    if (process.env.REQUIRE_JURISDICTION_MATCH === "1") {
+      const runtimeJurisdiction = (process.env.RUNTIME_JURISDICTION ?? "").trim();
+      const requesterJurisdiction = (request.rp.jurisdiction ?? "").trim();
+      if (!runtimeJurisdiction || !requesterJurisdiction || runtimeJurisdiction !== requesterJurisdiction) {
+        return deny(request.requestId, "DENY_JURISDICTION_INCOMPATIBLE");
+      }
+    }
+
     // rate-limit gate
     const allowed = checkRateLimit(request.rp.id, {
       windowSeconds: 60,

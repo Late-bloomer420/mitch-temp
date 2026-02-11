@@ -41,6 +41,11 @@ Operational behavior notes:
 - `HIGH_RISK_PURPOSES=medical_record_access,account_recovery,kyc_full_profile`
 - `SENSITIVE_CLAIMS=full_name,birth_date,address,national_id`
 
+## Jurisdiction compatibility (optional strict mode)
+- `REQUIRE_JURISDICTION_MATCH=1`
+- `RUNTIME_JURISDICTION=EU`
+- requests should include `rp.jurisdiction` (e.g., `EU`) when strict mode is active.
+
 ## Safety defaults
 - `NODE_ENV=production` to disable dashboard/test endpoints
 - `ALLOW_METRICS=1` only if metrics endpoint is explicitly desired

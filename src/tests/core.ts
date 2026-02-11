@@ -115,7 +115,17 @@ async function run(): Promise<void> {
   assert.equal(revokedCred.decisionCode, "DENY_CRYPTO_KEY_STATUS_INVALID");
   delete process.env.REVOKED_CREDENTIAL_IDS;
 
-  // 8) unknown schema field
+  // 8) jurisdiction incompatibility
+  process.env.REQUIRE_JURISDICTION_MATCH = "1";
+  process.env.RUNTIME_JURISDICTION = "EU";
+  const jurisdictionReq = buildRequest();
+  jurisdictionReq.rp.jurisdiction = "US";
+  const jurisdictionRes = await verifyRequest(jurisdictionReq, policy, "rp.example", resolveKey);
+  assert.equal(jurisdictionRes.decisionCode, "DENY_JURISDICTION_INCOMPATIBLE");
+  delete process.env.REQUIRE_JURISDICTION_MATCH;
+  delete process.env.RUNTIME_JURISDICTION;
+
+  // 9) unknown schema field
   const unknownFieldReq = {
     ...buildRequest(),
     sneaky: true,

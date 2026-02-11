@@ -10,6 +10,7 @@ export interface VerificationRequestV0 {
   rp: {
     id: string;
     audience: string;
+    jurisdiction?: string;
   };
   purpose: string;
   claims: VerificationClaim[];

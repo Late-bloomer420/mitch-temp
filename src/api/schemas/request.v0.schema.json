@@ -10,7 +10,8 @@
       "required": ["id", "audience"],
       "properties": {
         "id": { "type": "string", "minLength": 1 },
-        "audience": { "type": "string", "minLength": 1 }
+        "audience": { "type": "string", "minLength": 1 },
+        "jurisdiction": { "type": "string", "minLength": 1 }
       },
       "additionalProperties": false
     },

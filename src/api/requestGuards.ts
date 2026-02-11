@@ -22,5 +22,9 @@ export function validateRequestSemantics(r: VerificationRequestV0): { ok: true }
     return { ok: false, code: "DENY_SCHEMA_MISSING_FIELD" };
   }
 
+  if (r.rp.jurisdiction !== undefined && (typeof r.rp.jurisdiction !== "string" || r.rp.jurisdiction.length === 0)) {
+    return { ok: false, code: "DENY_SCHEMA_TYPE_MISMATCH" };
+  }
+
   return { ok: true };
 }
