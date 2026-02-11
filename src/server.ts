@@ -31,6 +31,15 @@ function sendJson(res: ServerResponse, statusCode: number, body: unknown, correl
   res.end(json);
 }
 
+function sendCsv(res: ServerResponse, statusCode: number, csv: string, correlationId?: string): void {
+  res.writeHead(statusCode, {
+    "Content-Type": "text/csv; charset=utf-8",
+    "Content-Length": Buffer.byteLength(csv),
+    ...(correlationId ? { "x-correlation-id": correlationId } : {}),
+  });
+  res.end(csv);
+}
+
 function readBody(req: IncomingMessage): Promise<string> {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
@@ -53,7 +62,7 @@ const server = createServer(async (req, res) => {
       200,
       {
         service: "miTch verifier",
-        endpoints: ["GET /", "GET /health", "GET /metrics", "GET /test-request (LOCAL_TEST_KEYS=1)", "POST /verify"],
+        endpoints: ["GET /", "GET /health", "GET /metrics", "GET /metrics.csv", "GET /test-request (LOCAL_TEST_KEYS=1)", "POST /verify"],
       },
       correlationId
     );
@@ -65,6 +74,19 @@ const server = createServer(async (req, res) => {
 
   if (req.method === "GET" && req.url === "/metrics") {
     return sendJson(res, 200, getMetricsSnapshot(), correlationId);
+  }
+
+  if (req.method === "GET" && req.url === "/metrics.csv") {
+    const m = getMetricsSnapshot();
+    const rows = [
+      "metric,value",
+      `startedAt,${m.startedAt}`,
+      `requests_total,${m.totals.requests}`,
+      `allow_total,${m.totals.allow}`,
+      `deny_total,${m.totals.deny}`,
+      ...Object.entries(m.denyByCode).map(([k, v]) => `deny_code_${k},${v}`),
+    ];
+    return sendCsv(res, 200, rows.join("\n"), correlationId);
   }
 
   if (req.method === "GET" && req.url === "/test-request") {

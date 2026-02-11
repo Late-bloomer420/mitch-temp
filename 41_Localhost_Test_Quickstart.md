@@ -27,6 +27,11 @@ Invoke-WebRequest -UseBasicParsing http://localhost:8080/health | Select-Object 
 Invoke-WebRequest -UseBasicParsing http://localhost:8080/metrics | Select-Object -ExpandProperty Content
 ```
 
+## Metrics CSV export
+```powershell
+Invoke-WebRequest -UseBasicParsing http://localhost:8080/metrics.csv | Select-Object -ExpandProperty Content
+```
+
 ## ALLOW path test (signed request)
 1) Generate signed request:
 ```powershell
