@@ -1,6 +1,7 @@
 import { readFileSync, existsSync } from "fs";
 import { getCredentialStatusCacheMetrics } from "../proof/credentialStatus";
 import { getResolverTelemetry } from "../proof/httpKeySource";
+import { getWebauthnTelemetry } from "./webauthnVerifier";
 
 const EVENTS_PATH = "./data/events.jsonl";
 
@@ -64,6 +65,7 @@ export function getKpiSnapshot(): Record<string, number> {
 
   const cache = getCredentialStatusCacheMetrics();
   const resolver = getResolverTelemetry();
+  const webauthn = getWebauthnTelemetry();
 
   const estimatedCostPerVerification = Number(process.env.ESTIMATED_COST_PER_VERIFICATION_EUR ?? 0.002);
   const allowedAlgsCount = (process.env.ALLOWED_ALGS ?? "EdDSA")
@@ -123,6 +125,13 @@ export function getKpiSnapshot(): Record<string, number> {
     webauthn_native_mode_enabled: webauthnNativeModeEnabled,
     webauthn_allowlist_mode_enabled: webauthnAllowlistModeEnabled,
     webauthn_secret_config_valid: webauthnSecretConfigValid,
+    webauthn_native_attempt_total: webauthn.webauthn_native_attempt_total,
+    webauthn_native_success_total: webauthn.webauthn_native_success_total,
+    webauthn_native_deny_total: webauthn.webauthn_native_deny_total,
+    webauthn_native_success_rate:
+      webauthn.webauthn_native_attempt_total > 0
+        ? webauthn.webauthn_native_success_total / webauthn.webauthn_native_attempt_total
+        : 0,
     estimated_monthly_verification_volume: Math.max(0, estimatedMonthlyVerificationVolume),
     estimated_fixed_monthly_cost_eur: estimatedFixedMonthlyCost,
     estimated_monthly_run_cost_eur: estimatedMonthlyRunCost,

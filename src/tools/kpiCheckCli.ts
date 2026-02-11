@@ -48,6 +48,10 @@ function run(): void {
   const webauthnNativeModeEnabled = Number(kpi.webauthn_native_mode_enabled ?? 0);
   const webauthnAllowlistModeEnabled = Number(kpi.webauthn_allowlist_mode_enabled ?? 0);
   const webauthnSecretConfigValid = Number(kpi.webauthn_secret_config_valid ?? 1);
+  const webauthnNativeAttemptTotal = Number(kpi.webauthn_native_attempt_total ?? 0);
+  const webauthnNativeSuccessTotal = Number(kpi.webauthn_native_success_total ?? 0);
+  const webauthnNativeDenyTotal = Number(kpi.webauthn_native_deny_total ?? 0);
+  const webauthnNativeSuccessRate = Number(kpi.webauthn_native_success_rate ?? 0);
 
   const issues: string[] = [];
 
@@ -133,6 +137,10 @@ function run(): void {
       webauthn_native_mode_enabled: webauthnNativeModeEnabled,
       webauthn_allowlist_mode_enabled: webauthnAllowlistModeEnabled,
       webauthn_secret_config_valid: webauthnSecretConfigValid,
+      webauthn_native_attempt_total: webauthnNativeAttemptTotal,
+      webauthn_native_success_total: webauthnNativeSuccessTotal,
+      webauthn_native_deny_total: webauthnNativeDenyTotal,
+      webauthn_native_success_rate: webauthnNativeSuccessRate,
       estimated_monthly_run_cost_eur: estimatedMonthlyRunCost,
       security_profile_score: securityProfileScore,
     },

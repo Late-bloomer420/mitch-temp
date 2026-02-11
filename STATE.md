@@ -16,9 +16,9 @@ Stand: 2026-02-12
 - Note: score depends on runtime config and current telemetry; this is not an absolute security guarantee.
 
 ## Now (do next)
-1. Add WebAuthn native-mode **actual usage-event** metrics (attempt/success/deny)
-2. Add focused tests for signed/native mismatch + replay edge cases
-3. Add doc/runbook for `security_profile_score` interpretation and operator actions
+1. Add focused tests for signed/native mismatch + replay edge cases
+2. Add doc/runbook for `security_profile_score` interpretation and operator actions
+3. Start strict native verifier adapter contract (input/output + deny mapping)
 
 ## Next (short buffer)
 1. Start strict native verifier adapter contract (input/output + deny mapping)
