@@ -25,6 +25,8 @@ Clients must send:
 
 ### http mode
 - `KEY_SOURCE_URL=http://key-provider.local/keys`
+- `KEY_SOURCE_URLS=https://resolver1.example/keys,https://resolver2.example/keys,https://resolver3.example/keys` (optional multi-source quorum)
+- `KEY_SOURCE_QUORUM=2`
 - `KEY_SOURCE_TIMEOUT_MS=1500`
 
 Optional revoked lists:

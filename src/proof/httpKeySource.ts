@@ -38,12 +38,32 @@ function fetchJson(urlStr: string, timeoutMs: number): Promise<Record<string, st
 }
 
 export class HttpKeySource implements KeySource {
-  constructor(private readonly url: string, private readonly timeoutMs = 1500) {}
+  constructor(
+    private readonly urls: string[],
+    private readonly timeoutMs = 1500,
+    private readonly quorum = 1
+  ) {}
 
   async getPublicKeyPem(keyId: string): Promise<string | null> {
-    const map = await fetchJson(this.url, this.timeoutMs);
-    if (!map) return null;
-    const pem = map[keyId];
-    return typeof pem === "string" && pem.length > 0 ? pem : null;
+    const maps = await Promise.all(this.urls.map((u) => fetchJson(u, this.timeoutMs)));
+
+    const counts = new Map<string, number>();
+    for (const map of maps) {
+      if (!map) continue;
+      const pem = map[keyId];
+      if (typeof pem !== "string" || pem.length === 0) continue;
+      counts.set(pem, (counts.get(pem) ?? 0) + 1);
+    }
+
+    let winner: string | null = null;
+    let winnerCount = 0;
+    for (const [pem, c] of counts.entries()) {
+      if (c > winnerCount) {
+        winner = pem;
+        winnerCount = c;
+      }
+    }
+
+    return winner && winnerCount >= this.quorum ? winner : null;
   }
 }

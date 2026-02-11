@@ -24,7 +24,13 @@ export function createKeySource(): KeySource {
   }
   if (mode === "http") {
     const { HttpKeySource } = require("./httpKeySource") as typeof import("./httpKeySource");
-    return new HttpKeySource(process.env.KEY_SOURCE_URL ?? "http://localhost:8090/keys", Number(process.env.KEY_SOURCE_TIMEOUT_MS ?? 1500));
+    const urls = (process.env.KEY_SOURCE_URLS ?? process.env.KEY_SOURCE_URL ?? "http://localhost:8090/keys")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const timeoutMs = Number(process.env.KEY_SOURCE_TIMEOUT_MS ?? 1500);
+    const quorum = Number(process.env.KEY_SOURCE_QUORUM ?? 1);
+    return new HttpKeySource(urls, timeoutMs, quorum);
   }
   return new EnvKeySource();
 }
