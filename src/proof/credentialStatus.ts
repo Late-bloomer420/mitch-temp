@@ -2,6 +2,9 @@ export type CredentialStatusCheck =
   | { ok: true; revoked: boolean }
   | { ok: false; reason: "credential_status_unavailable" };
 
+const revokedCacheById = new Map<string, number>();
+const revokedCacheByIndex = new Map<string, number>();
+
 function parseRevokedIds(value?: string): Set<string> {
   return new Set(
     (value ?? "")
@@ -9,6 +12,58 @@ function parseRevokedIds(value?: string): Set<string> {
       .map((s) => s.trim())
       .filter(Boolean)
   );
+}
+
+function getRevokedCacheTtlMs(): number {
+  return Number(process.env.CREDENTIAL_STATUS_REVOKED_CACHE_TTL_MS ?? 10000);
+}
+
+function getRevokedCacheMaxEntries(): number {
+  return Number(process.env.CREDENTIAL_STATUS_REVOKED_CACHE_MAX_ENTRIES ?? 1000);
+}
+
+function nowMs(): number {
+  return Date.now();
+}
+
+function pruneRevokedCache(map: Map<string, number>): void {
+  const now = nowMs();
+  for (const [k, expiresAt] of map.entries()) {
+    if (expiresAt <= now) map.delete(k);
+  }
+
+  const max = getRevokedCacheMaxEntries();
+  while (map.size > max) {
+    const firstKey = map.keys().next().value;
+    if (!firstKey) break;
+    map.delete(firstKey);
+  }
+}
+
+function isRevokedCached(credentialId: string, statusListIndex: string): boolean {
+  pruneRevokedCache(revokedCacheById);
+  pruneRevokedCache(revokedCacheByIndex);
+
+  const now = nowMs();
+  const idExpiry = credentialId ? revokedCacheById.get(credentialId) : undefined;
+  if (typeof idExpiry === "number" && idExpiry > now) return true;
+
+  const idxExpiry = statusListIndex ? revokedCacheByIndex.get(statusListIndex) : undefined;
+  if (typeof idxExpiry === "number" && idxExpiry > now) return true;
+
+  return false;
+}
+
+function cacheRevokedSignals(credentialId: string, statusListIndex: string): void {
+  const ttl = getRevokedCacheTtlMs();
+  if (ttl <= 0) return;
+
+  const expiresAt = nowMs() + ttl;
+  if (credentialId) revokedCacheById.set(credentialId, expiresAt);
+  if (statusListIndex) revokedCacheByIndex.set(statusListIndex, expiresAt);
+
+  pruneRevokedCache(revokedCacheById);
+  pruneRevokedCache(revokedCacheByIndex);
 }
 
 async function checkHttpStatus(
@@ -95,22 +150,40 @@ export async function checkCredentialRevocation(
   const effectiveCredentialId = credentialId ?? "";
   const effectiveStatusIndex = credentialStatus?.statusListIndex?.trim() ?? "";
 
+  // security-conservative local cache: revoked=true only, never cache allow
+  if (isRevokedCached(effectiveCredentialId, effectiveStatusIndex)) {
+    return { ok: true, revoked: true };
+  }
+
   // baseline env mode
   const envRevoked = parseRevokedIds(process.env.REVOKED_CREDENTIAL_IDS);
   const envRevokedIndexes = parseRevokedIds(process.env.REVOKED_STATUS_LIST_INDEXES);
   if (mode === "env") {
     const revokedById = effectiveCredentialId ? envRevoked.has(effectiveCredentialId) : false;
     const revokedByIndex = effectiveStatusIndex ? envRevokedIndexes.has(effectiveStatusIndex) : false;
-    return { ok: true, revoked: revokedById || revokedByIndex };
+    const revoked = revokedById || revokedByIndex;
+    if (revoked) cacheRevokedSignals(effectiveCredentialId, effectiveStatusIndex);
+    return { ok: true, revoked };
   }
 
   // optional http mode scaffold
   if (mode === "http") {
     if (!effectiveCredentialId) return { ok: false, reason: "credential_status_unavailable" };
     // local list still applies as immediate deny list
-    if (envRevoked.has(effectiveCredentialId)) return { ok: true, revoked: true };
-    if (effectiveStatusIndex && envRevokedIndexes.has(effectiveStatusIndex)) return { ok: true, revoked: true };
-    return checkHttpStatus(effectiveCredentialId, effectiveStatusIndex || undefined);
+    if (envRevoked.has(effectiveCredentialId)) {
+      cacheRevokedSignals(effectiveCredentialId, effectiveStatusIndex);
+      return { ok: true, revoked: true };
+    }
+    if (effectiveStatusIndex && envRevokedIndexes.has(effectiveStatusIndex)) {
+      cacheRevokedSignals(effectiveCredentialId, effectiveStatusIndex);
+      return { ok: true, revoked: true };
+    }
+
+    const remote = await checkHttpStatus(effectiveCredentialId, effectiveStatusIndex || undefined);
+    if (remote.ok && remote.revoked) {
+      cacheRevokedSignals(effectiveCredentialId, effectiveStatusIndex);
+    }
+    return remote;
   }
 
   return { ok: false, reason: "credential_status_unavailable" };

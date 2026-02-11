@@ -36,6 +36,8 @@ Credential status resolver mode:
 - `CREDENTIAL_STATUS_URL=http://status-provider.local/credentials/revoked` (http mode)
 - `CREDENTIAL_STATUS_TIMEOUT_MS=1500`
 - `CREDENTIAL_STATUS_MAX_BYTES=65536` (fail-closed if status payload exceeds this)
+- `CREDENTIAL_STATUS_REVOKED_CACHE_TTL_MS=10000` (revoked-only local cache TTL)
+- `CREDENTIAL_STATUS_REVOKED_CACHE_MAX_ENTRIES=1000`
 - `REVOKED_STATUS_LIST_INDEXES=42,99` (env mode StatusList-style index deny list)
 
 Operational behavior notes:

@@ -128,7 +128,42 @@ async function run(): Promise<void> {
   delete process.env.CREDENTIAL_STATUS_URL;
   delete process.env.CREDENTIAL_STATUS_TIMEOUT_MS;
 
-  // 7f) malformed credential status payload (http mode)
+  // 7f) revoked-only cache behavior (http mode)
+  process.env.CREDENTIAL_STATUS_MODE = "http";
+  process.env.CREDENTIAL_STATUS_URL = "http://127.0.0.1:18084/revoked";
+  process.env.CREDENTIAL_STATUS_TIMEOUT_MS = "200";
+  process.env.CREDENTIAL_STATUS_REVOKED_CACHE_TTL_MS = "10000";
+  const revokedCacheServer = createServer((_, res) => {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ revokedCredentialIds: ["cred-cache-1"] }));
+  });
+  await new Promise<void>((resolve) => revokedCacheServer.listen(18084, resolve));
+
+  const cachePrimeReq = buildRequest();
+  cachePrimeReq.proofBundle.credentialId = "cred-cache-1";
+  const cachePrimeRes = await verifyRequest(cachePrimeReq, policy, "rp.example", resolveKey);
+  assert.equal(cachePrimeRes.decisionCode, "DENY_CREDENTIAL_REVOKED");
+  await new Promise<void>((resolve, reject) => revokedCacheServer.close((err) => (err ? reject(err) : resolve())));
+
+  // provider down now; same revoked credential should still deny from local revoked-only cache
+  process.env.CREDENTIAL_STATUS_URL = "http://127.0.0.1:9/revoked";
+  const cacheHitReq = buildRequest();
+  cacheHitReq.proofBundle.credentialId = "cred-cache-1";
+  const cacheHitRes = await verifyRequest(cacheHitReq, policy, "rp.example", resolveKey);
+  assert.equal(cacheHitRes.decisionCode, "DENY_CREDENTIAL_REVOKED");
+
+  // different credential must NOT get allow from cache; should fail closed on unavailable source
+  const cacheMissReq = buildRequest();
+  cacheMissReq.proofBundle.credentialId = "cred-cache-2";
+  const cacheMissRes = await verifyRequest(cacheMissReq, policy, "rp.example", resolveKey);
+  assert.equal(cacheMissRes.decisionCode, "DENY_STATUS_SOURCE_UNAVAILABLE");
+
+  delete process.env.CREDENTIAL_STATUS_MODE;
+  delete process.env.CREDENTIAL_STATUS_URL;
+  delete process.env.CREDENTIAL_STATUS_TIMEOUT_MS;
+  delete process.env.CREDENTIAL_STATUS_REVOKED_CACHE_TTL_MS;
+
+  // 7g) malformed credential status payload (http mode)
   const malformedStatusServer = createServer((_, res) => {
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ unexpected: true }));
