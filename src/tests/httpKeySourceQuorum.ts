@@ -37,6 +37,10 @@ async function run(): Promise<void> {
     const pemStrict = await strict.getPublicKeyPem("kid-1");
     assert.equal(pemStrict, null, "Expected null when quorum cannot be met");
 
+    // no-silent-allow assertion: mismatch/no-quorum must never produce a key
+    const noSilentAllow = await strict.getPublicKeyPem("kid-1");
+    assert.equal(noSilentAllow, null, "No silent allow on repeated mismatch/no-quorum");
+
     const telemetry = getResolverTelemetry();
     assert.ok(telemetry.resolver_queries_total >= 2, "Expected resolver query telemetry increments");
     assert.ok(telemetry.resolver_inconsistent_responses_total >= 1, "Expected inconsistency telemetry increment");
