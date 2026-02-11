@@ -50,7 +50,7 @@ function buildRequest(): VerificationRequestV0 {
   return r;
 }
 
-async function run(): Promise<void> {
+export async function runEvidenceScenarios(): Promise<{ generatedAt: string; results: Array<{ scenario: string; code: string }> }> {
   const results: Array<{ scenario: string; code: string }> = [];
 
   // 1) ALLOW
@@ -79,10 +79,14 @@ async function run(): Promise<void> {
   results.push({ scenario: "deny_revoked_key", code: revoked.decisionCode });
   assert.equal(revoked.decisionCode, "DENY_CRYPTO_KEY_STATUS_INVALID");
 
-  console.log(JSON.stringify({ generatedAt: new Date().toISOString(), results }, null, 2));
+  return { generatedAt: new Date().toISOString(), results };
 }
 
-run().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+if (require.main === module) {
+  runEvidenceScenarios()
+    .then((out) => console.log(JSON.stringify(out, null, 2)))
+    .catch((err) => {
+      console.error(err);
+      process.exit(1);
+    });
+}

@@ -9,6 +9,12 @@ cd C:\Users\Admin\Documents\miTch
 npm run evidence
 ```
 
+## Export pack (recommended)
+```powershell
+npm run evidence:export
+```
+Creates a timestamped folder under `data/evidence/<timestamp>/`.
+
 ## Expected scenarios
 - `allow_valid` -> `ALLOW_MINIMAL_PROOF_VALID`
 - `deny_replay` -> `DENY_BINDING_NONCE_REPLAY`
