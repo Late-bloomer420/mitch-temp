@@ -102,6 +102,7 @@ const server = createServer(async (req, res) => {
   if (req.method === "GET" && req.url === "/dashboard") {
     if (IS_PROD) return sendJson(res, 404, { error: "not_found" }, correlationId);
     const m = getMetricsSnapshot();
+    const k = getKpiSnapshot();
     const recentRows = m.recentDecisions
       .map(
         (d) => `<tr><td>${d.at}</td><td>${d.requestId}</td><td>${d.decision}</td><td>${d.decisionCode}</td></tr>`
@@ -118,6 +119,13 @@ const server = createServer(async (req, res) => {
 </ul>
 <h3>Deny by Code</h3>
 <pre>${JSON.stringify(m.denyByCode, null, 2)}</pre>
+<h3>Security KPI (critical deny categories)</h3>
+<ul>
+<li><b>deny_credential_revoked_total:</b> ${k.deny_credential_revoked_total ?? 0}</li>
+<li><b>deny_status_source_unavailable_total:</b> ${k.deny_status_source_unavailable_total ?? 0}</li>
+<li><b>deny_jurisdiction_incompatible_total:</b> ${k.deny_jurisdiction_incompatible_total ?? 0}</li>
+<li><b>deny_status_source_unavailable_rate:</b> ${k.deny_status_source_unavailable_rate ?? 0}</li>
+</ul>
 <h3>Recent Decisions (last 10)</h3>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%">
 <thead><tr><th>Time</th><th>Request ID</th><th>Decision</th><th>Code</th></tr></thead>

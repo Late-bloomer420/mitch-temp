@@ -90,6 +90,7 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `63_Deny_Code_Credential_Revoked.md` — dedicated deny code for credential-level revocation outcomes
 - `64_Deny_Code_Status_Source_Unavailable.md` — dedicated deny code for revocation/status source outages
 - `65_KPI_Deny_Category_Visibility.md` — explicit KPI fields for critical deny categories
+- `66_Dashboard_Security_KPI_Box.md` — dashboard section for high-signal deny-category KPIs
 - `src/api/metrics.ts` — in-service counters for basic KPI telemetry (`GET /metrics`)
 - `src/api/eventLog.ts` + `src/api/kpi.ts` — structured audit events and derived KPI snapshot (`GET /kpi`)
 - `src/api/auditVerify.ts` — audit hash-chain integrity verification (`GET /audit/verify`)
