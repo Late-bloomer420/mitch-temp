@@ -49,6 +49,10 @@ export function getKpiSnapshot(): Record<string, number> {
   const replayDenies = decisions.filter((e) => e.decisionCode === "DENY_BINDING_NONCE_REPLAY").length;
   const replayAttempts = replayDenies;
 
+  const denyCredentialRevoked = decisions.filter((e) => e.decisionCode === "DENY_CREDENTIAL_REVOKED").length;
+  const denyStatusSourceUnavailable = decisions.filter((e) => e.decisionCode === "DENY_STATUS_SOURCE_UNAVAILABLE").length;
+  const denyJurisdictionIncompatible = decisions.filter((e) => e.decisionCode === "DENY_JURISDICTION_INCOMPATIBLE").length;
+
   const latencies = decisions
     .map((e) => e.latencyMs)
     .filter((v): v is number => typeof v === "number" && v >= 0);
@@ -61,6 +65,10 @@ export function getKpiSnapshot(): Record<string, number> {
     replay_block_rate: replayAttempts > 0 ? replayDenies / replayAttempts : 1,
     false_deny_rate: legitAdjudications > 0 ? falseDenies / legitAdjudications : 0,
     policy_override_rate: total > 0 ? overrides / total : 0,
+    deny_credential_revoked_total: denyCredentialRevoked,
+    deny_status_source_unavailable_total: denyStatusSourceUnavailable,
+    deny_jurisdiction_incompatible_total: denyJurisdictionIncompatible,
+    deny_status_source_unavailable_rate: denies > 0 ? denyStatusSourceUnavailable / denies : 0,
     latency_p50_ms: percentile(latencies, 50),
     latency_p95_ms: percentile(latencies, 95),
   };
