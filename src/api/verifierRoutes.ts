@@ -53,7 +53,11 @@ export async function verifyRequest(
     if (!sem.ok) return deny(request.requestId, sem.code);
 
     // rate-limit gate
-    const allowed = checkRateLimit(request.rp.id, { windowSeconds: 60, maxRequestsPerRequester: 10 });
+    const allowed = checkRateLimit(request.rp.id, {
+      windowSeconds: 60,
+      maxRequestsPerRequester: 10,
+      maxRequestsGlobal: Number(process.env.MAX_REQUESTS_GLOBAL ?? 100),
+    });
     if (!allowed) return deny(request.requestId, "DENY_RATE_LIMIT_EXCEEDED");
 
     // binding gate

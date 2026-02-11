@@ -19,9 +19,9 @@ npm run swarm:test
 
 ## Expected interpretation
 - Same requester burst should trigger rate-limit denies.
-- Distributed requester swarm may bypass current per-requester limit (known limitation).
+- Distributed requester swarm should now also trigger denies via global request budget baseline.
 
-## Next hardening suggestions
+## Remaining hardening suggestions
 1. Add global concurrency caps and queue protections.
 2. Add IP/network-level limits (outside app layer).
 3. Add challenge/escalation path on anomaly spikes.

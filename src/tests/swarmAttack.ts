@@ -1,6 +1,7 @@
 import assert from "assert";
 import { generateKeyPairSync, sign } from "crypto";
 import { verifyRequest } from "../api/verifierRoutes";
+import { resetRateLimiter } from "../api/rateLimiter";
 import { computeRequestHash } from "../binding/requestHash";
 import { VerificationRequestV0 } from "../types/api";
 import { PolicyManifestV0 } from "../types/policy";
@@ -50,14 +51,18 @@ function buildRequest(rpId: string): VerificationRequestV0 {
 }
 
 async function run(): Promise<void> {
+  process.env.MAX_REQUESTS_GLOBAL = "30";
+
   // Scenario A: burst from same requester (rate limiting expected)
+  resetRateLimiter();
   const sameRequester = Array.from({ length: 60 }, () =>
     verifyRequest(buildRequest("rp.swarm.same"), policy, "rp.example", activeResolver)
   );
   const sameResults = await Promise.all(sameRequester);
   const sameDeniedRateLimit = sameResults.filter((r) => r.decisionCode === "DENY_RATE_LIMIT_EXCEEDED").length;
 
-  // Scenario B: distributed swarm (unique requester ids) - demonstrates current limit scope
+  // Scenario B: distributed swarm (unique requester ids) - should hit global limit
+  resetRateLimiter();
   const distributed = Array.from({ length: 60 }, (_, i) =>
     verifyRequest(buildRequest(`rp.swarm.${i}`), policy, "rp.example", activeResolver)
   );
@@ -66,7 +71,7 @@ async function run(): Promise<void> {
 
   // Assertions for current model behavior
   assert.ok(sameDeniedRateLimit > 0, "Expected rate-limit denies for same requester burst");
-  assert.ok(distDeniedRateLimit === 0, "Distributed burst should bypass per-requester limit in current model");
+  assert.ok(distDeniedRateLimit > 0, "Expected distributed burst to hit global limit");
 
   console.log(
     JSON.stringify(
@@ -80,7 +85,7 @@ async function run(): Promise<void> {
           total: distResults.length,
           deny_rate_limit: distDeniedRateLimit,
         },
-        note: "Current rate limiting is per requester-id; distributed swarm protection requires additional controls.",
+        note: "Global request budget baseline added; distributed swarm now triggers rate-limit denies.",
       },
       null,
       2
