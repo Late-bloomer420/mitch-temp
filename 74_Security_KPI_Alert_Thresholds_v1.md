@@ -32,6 +32,13 @@ Define simple, actionable alert thresholds for pilot operations.
   1. Align native mode usage with strong re-auth policy
   2. Confirm this is intentional in runtime profile
 
+### 0d) Strong mode with allowlist verifier drift
+- Signal: `reauth_strong_enabled = 1` and `webauthn_allowlist_mode_enabled = 1`
+- Warning: any occurrence
+- Action:
+  1. Move verification mode to `signed` or `native`
+  2. Keep allowlist mode only for explicit compatibility windows
+
 ### 1) Status source degradation
 - Signal: `deny_status_source_unavailable_rate`
 - Warning: `> 0.05` over last review window

@@ -45,6 +45,7 @@ function run(): void {
   const reauthStrongEnabled = Number(kpi.reauth_strong_enabled ?? 0);
   const webauthnModeCode = Number(kpi.webauthn_verify_mode_code ?? 0);
   const webauthnNativeModeEnabled = Number(kpi.webauthn_native_mode_enabled ?? 0);
+  const webauthnAllowlistModeEnabled = Number(kpi.webauthn_allowlist_mode_enabled ?? 0);
   const webauthnSecretConfigValid = Number(kpi.webauthn_secret_config_valid ?? 1);
 
   const issues: string[] = [];
@@ -69,6 +70,10 @@ function run(): void {
 
   if (webauthnNativeModeEnabled === 1 && reauthStrongEnabled !== 1) {
     issues.push("WARNING: WebAuthn native mode enabled while strong re-auth is not enabled");
+  }
+
+  if (reauthStrongEnabled === 1 && webauthnAllowlistModeEnabled === 1) {
+    issues.push("WARNING: strong re-auth enabled but WebAuthn verify mode is still allowlist");
   }
 
   if (resolverInconsistent > t.critResolverInconsistentTotal) {
@@ -119,6 +124,7 @@ function run(): void {
       reauth_strong_enabled: reauthStrongEnabled,
       webauthn_verify_mode_code: webauthnModeCode,
       webauthn_native_mode_enabled: webauthnNativeModeEnabled,
+      webauthn_allowlist_mode_enabled: webauthnAllowlistModeEnabled,
       webauthn_secret_config_valid: webauthnSecretConfigValid,
       estimated_monthly_run_cost_eur: estimatedMonthlyRunCost,
     },
