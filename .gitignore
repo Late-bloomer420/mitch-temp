@@ -1,5 +1,13 @@
+# Dependencies / build artifacts
+node_modules/
+dist/
+
 # Archives
 *.zip
+
+# Logs
+*.log
+npm-debug.log*
 
 # OS/editor
 .DS_Store
