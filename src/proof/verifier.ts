@@ -4,6 +4,15 @@ import { ResolveKey } from "./keyResolver";
 
 const ALLOWED_ALGS = new Set(["EdDSA"]);
 
+function isRevokedCredential(credentialId?: string): boolean {
+  if (!credentialId) return false;
+  return (process.env.REVOKED_CREDENTIAL_IDS ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .includes(credentialId);
+}
+
 function base64UrlToBuffer(input: string): Buffer {
   const b64 = input.replace(/-/g, "+").replace(/_/g, "/");
   const padded = b64 + "=".repeat((4 - (b64.length % 4)) % 4);
@@ -18,6 +27,8 @@ export async function verifyProofBundle(
   if (!bundle || typeof bundle !== "object") return { ok: false, reason: "missing_bundle" };
   if (!bundle.proof || bundle.proof.trim().length === 0) return { ok: false, reason: "empty_proof" };
   if (!bundle.alg || !ALLOWED_ALGS.has(bundle.alg)) return { ok: false, reason: "unsupported_alg" };
+
+  if (isRevokedCredential(bundle.credentialId)) return { ok: false, reason: "revoked_credential" };
 
   const key = await resolveKey(bundle.keyId);
   if (key.status === "revoked") return { ok: false, reason: "revoked_key" };

@@ -42,5 +42,6 @@ export interface ProofBundleV0 {
   proof: string;
   disclosures?: string[];
   keyId?: string;
+  credentialId?: string;
   alg?: string;
 }

@@ -82,6 +82,7 @@ export async function verifyRequest(
     if (!crypto.ok) {
       if (crypto.reason === "unsupported_alg") return deny(request.requestId, "DENY_CRYPTO_UNSUPPORTED_ALG");
       if (crypto.reason === "revoked_key") return deny(request.requestId, "DENY_CRYPTO_KEY_STATUS_INVALID");
+      if (crypto.reason === "revoked_credential") return deny(request.requestId, "DENY_CRYPTO_KEY_STATUS_INVALID");
       if (crypto.reason === "missing_key") return deny(request.requestId, "DENY_CRYPTO_KEY_STATUS_INVALID");
       if (crypto.reason === "status_unavailable") {
         return shouldFailClosedOnStatusUnavailable(request.purpose)

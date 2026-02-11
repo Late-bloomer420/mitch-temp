@@ -27,12 +27,19 @@ Clients must send:
 - `KEY_SOURCE_URL=http://key-provider.local/keys`
 - `KEY_SOURCE_TIMEOUT_MS=1500`
 
-Optional revoked list:
+Optional revoked lists:
 - `REVOKED_KEY_IDS=kid-2,kid-3`
+- `REVOKED_CREDENTIAL_IDS=cred-1,cred-2`
 
 Operational behavior notes:
 - missing/revoked/status-unavailable keys are deny-biased for high-risk purposes.
 - keep key source timeout low (e.g., `KEY_SOURCE_TIMEOUT_MS=1500`) to avoid hanging verifier paths.
+
+## Proof-fatigue baseline controls
+- `PROOF_FATIGUE_WINDOW_SECONDS=3600`
+- `PROOF_FATIGUE_MAX_HIGH_RISK_PROMPTS=5`
+- `HIGH_RISK_PURPOSES=medical_record_access,account_recovery,kyc_full_profile`
+- `SENSITIVE_CLAIMS=full_name,birth_date,address,national_id`
 
 ## Safety defaults
 - `NODE_ENV=production` to disable dashboard/test endpoints

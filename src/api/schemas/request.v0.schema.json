@@ -36,6 +36,7 @@
         "proof": { "type": "string", "minLength": 1 },
         "disclosures": { "type": "array", "items": { "type": "string" } },
         "keyId": { "type": "string" },
+        "credentialId": { "type": "string" },
         "alg": { "type": "string", "minLength": 1 }
       },
       "additionalProperties": false

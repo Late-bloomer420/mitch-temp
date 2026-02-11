@@ -106,6 +106,15 @@ async function run(): Promise<void> {
   const unavailable = await verifyRequest(buildRequest(), policy, "rp.example", unavailableResolver);
   assert.equal(unavailable.decisionCode, "DENY_CRYPTO_KEY_STATUS_INVALID");
 
+  // 7d) revoked credential id
+  resetRateLimiter();
+  process.env.REVOKED_CREDENTIAL_IDS = "cred-revoked-1";
+  const revokedCredReq = buildRequest();
+  revokedCredReq.proofBundle.credentialId = "cred-revoked-1";
+  const revokedCred = await verifyRequest(revokedCredReq, policy, "rp.example", resolveKey);
+  assert.equal(revokedCred.decisionCode, "DENY_CRYPTO_KEY_STATUS_INVALID");
+  delete process.env.REVOKED_CREDENTIAL_IDS;
+
   // 8) unknown schema field
   const unknownFieldReq = {
     ...buildRequest(),
