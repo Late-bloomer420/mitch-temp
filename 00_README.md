@@ -36,4 +36,6 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `15_MVP_Work_Breakdown.md` — epics/tasks/owners/estimates for delivery
 - `16_MVP_Architecture_Decision_Log.md` — ADR index for hard technical choices
 - `17_API_Contract_v0.md` — requester/verifier contract draft for MVP
+- `18_Test_Plan_Adversarial_and_E2E.md` — adversarial + E2E test strategy
+- `19_Data_Retention_Matrix.md` — field-level retention and purge policy
 - `WHAT_MITCH_IS_NOT.md` — guardrails / positioning
