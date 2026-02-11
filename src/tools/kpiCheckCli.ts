@@ -5,6 +5,8 @@ interface Thresholds {
   critStatusUnavailableRate: number;
   warnResolverInconsistentTotal: number;
   critResolverInconsistentTotal: number;
+  warnResolverQuorumFailuresTotal: number;
+  critResolverQuorumFailuresTotal: number;
   failOnWarning: boolean;
 }
 
@@ -14,6 +16,8 @@ function getThresholds(): Thresholds {
     critStatusUnavailableRate: Number(process.env.KPI_CRIT_STATUS_UNAVAILABLE_RATE ?? 0.2),
     warnResolverInconsistentTotal: Number(process.env.KPI_WARN_RESOLVER_INCONSISTENT_TOTAL ?? 5),
     critResolverInconsistentTotal: Number(process.env.KPI_CRIT_RESOLVER_INCONSISTENT_TOTAL ?? 20),
+    warnResolverQuorumFailuresTotal: Number(process.env.KPI_WARN_RESOLVER_QUORUM_FAILURES_TOTAL ?? 5),
+    critResolverQuorumFailuresTotal: Number(process.env.KPI_CRIT_RESOLVER_QUORUM_FAILURES_TOTAL ?? 20),
     failOnWarning: process.env.KPI_FAIL_ON_WARNING === "1",
   };
 }
@@ -49,6 +53,16 @@ function run(): void {
   } else if (resolverInconsistent > t.warnResolverInconsistentTotal) {
     issues.push(
       `WARNING: resolver_inconsistent_responses_total=${resolverInconsistent} > ${t.warnResolverInconsistentTotal}`
+    );
+  }
+
+  if (resolverQuorumFailures > t.critResolverQuorumFailuresTotal) {
+    issues.push(
+      `CRITICAL: resolver_quorum_failures_total=${resolverQuorumFailures} > ${t.critResolverQuorumFailuresTotal}`
+    );
+  } else if (resolverQuorumFailures > t.warnResolverQuorumFailuresTotal) {
+    issues.push(
+      `WARNING: resolver_quorum_failures_total=${resolverQuorumFailures} > ${t.warnResolverQuorumFailuresTotal}`
     );
   }
 

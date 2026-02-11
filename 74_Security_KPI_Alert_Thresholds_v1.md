@@ -52,6 +52,15 @@ Define simple, actionable alert thresholds for pilot operations.
   2. Check for targeted mismatch/eclipsing conditions
   3. Temporarily increase quorum strictness if needed
 
+### 6) Resolver quorum failure drift
+- Signal: `resolver_quorum_failures_total`
+- Warning: `> KPI_WARN_RESOLVER_QUORUM_FAILURES_TOTAL` (default 5)
+- Critical: `> KPI_CRIT_RESOLVER_QUORUM_FAILURES_TOTAL` (default 20)
+- Action:
+  1. Check resolver availability/latency and timeout settings
+  2. Validate quorum configuration against endpoint quality
+  3. Escalate if sustained failures impact verification continuity
+
 ## Operational notes
 - Evaluate thresholds per rolling window (e.g., 15-60 min) rather than raw lifetime totals.
 - `kpi:check` behavior can be tuned with `KPI_FAIL_ON_WARNING` (default soft-fail on warnings).

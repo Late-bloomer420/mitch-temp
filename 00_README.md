@@ -112,6 +112,7 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `84_DID_Resolver_Quorum_Logic_v1.md` - implemented multi-source key resolver quorum behavior
 - `85_Resolver_Inconsistency_Observability_v1.md` - resolver telemetry surfaced via KPI/dashboard
 - `86_KPI_Resolver_Inconsistency_Alerts.md` - KPI threshold alerts for resolver inconsistency drift
+- `87_KPI_Resolver_Quorum_Failure_Alerts.md` - KPI threshold alerts for resolver quorum-failure drift
 - `src/tools/kpiCheckCli.ts` - CLI check for KPI thresholds (`npm run kpi:check`)
 - `src/api/metrics.ts` - in-service counters for basic KPI telemetry (`GET /metrics`)
 - `src/api/eventLog.ts` + `src/api/kpi.ts` - structured audit events and derived KPI snapshot (`GET /kpi`)
