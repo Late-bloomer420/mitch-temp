@@ -1,0 +1,36 @@
+name: ci-security
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Compile + tests
+        run: npm test
+
+      - name: Swarm attack test
+        run: npm run swarm:test
+
+      - name: Evidence run
+        run: npm run evidence
+
+      - name: Dependency security gate
+        run: npm run security:deps
