@@ -7,6 +7,8 @@ interface Thresholds {
   critResolverInconsistentTotal: number;
   warnResolverQuorumFailuresTotal: number;
   critResolverQuorumFailuresTotal: number;
+  warnDenyResolverQuorumFailedTotal: number;
+  critDenyResolverQuorumFailedTotal: number;
   failOnWarning: boolean;
 }
 
@@ -18,6 +20,8 @@ function getThresholds(): Thresholds {
     critResolverInconsistentTotal: Number(process.env.KPI_CRIT_RESOLVER_INCONSISTENT_TOTAL ?? 20),
     warnResolverQuorumFailuresTotal: Number(process.env.KPI_WARN_RESOLVER_QUORUM_FAILURES_TOTAL ?? 5),
     critResolverQuorumFailuresTotal: Number(process.env.KPI_CRIT_RESOLVER_QUORUM_FAILURES_TOTAL ?? 20),
+    warnDenyResolverQuorumFailedTotal: Number(process.env.KPI_WARN_DENY_RESOLVER_QUORUM_FAILED_TOTAL ?? 2),
+    critDenyResolverQuorumFailedTotal: Number(process.env.KPI_CRIT_DENY_RESOLVER_QUORUM_FAILED_TOTAL ?? 10),
     failOnWarning: process.env.KPI_FAIL_ON_WARNING === "1",
   };
 }
@@ -64,6 +68,16 @@ function run(): void {
   } else if (resolverQuorumFailures > t.warnResolverQuorumFailuresTotal) {
     issues.push(
       `WARNING: resolver_quorum_failures_total=${resolverQuorumFailures} > ${t.warnResolverQuorumFailuresTotal}`
+    );
+  }
+
+  if (denyResolverQuorumFailed > t.critDenyResolverQuorumFailedTotal) {
+    issues.push(
+      `CRITICAL: deny_resolver_quorum_failed_total=${denyResolverQuorumFailed} > ${t.critDenyResolverQuorumFailedTotal}`
+    );
+  } else if (denyResolverQuorumFailed > t.warnDenyResolverQuorumFailedTotal) {
+    issues.push(
+      `WARNING: deny_resolver_quorum_failed_total=${denyResolverQuorumFailed} > ${t.warnDenyResolverQuorumFailedTotal}`
     );
   }
 

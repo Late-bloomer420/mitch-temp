@@ -61,6 +61,15 @@ Define simple, actionable alert thresholds for pilot operations.
   2. Validate quorum configuration against endpoint quality
   3. Escalate if sustained failures impact verification continuity
 
+### 7) Quorum-failure deny pressure
+- Signal: `deny_resolver_quorum_failed_total`
+- Warning: `> KPI_WARN_DENY_RESOLVER_QUORUM_FAILED_TOTAL` (default 2)
+- Critical: `> KPI_CRIT_DENY_RESOLVER_QUORUM_FAILED_TOTAL` (default 10)
+- Action:
+  1. Investigate resolver disagreement vs outage root cause
+  2. Confirm no targeted path manipulation
+  3. Consider temporary stricter resolver profile and partner notification
+
 ## Operational notes
 - Evaluate thresholds per rolling window (e.g., 15-60 min) rather than raw lifetime totals.
 - `kpi:check` behavior can be tuned with `KPI_FAIL_ON_WARNING` (default soft-fail on warnings).
