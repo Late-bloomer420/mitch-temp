@@ -41,3 +41,13 @@ export function getMetricsSnapshot(): ServiceMetrics {
     denyByCode: { ...metrics.denyByCode },
   };
 }
+
+export function resetMetrics(): ServiceMetrics {
+  metrics.startedAt = new Date().toISOString();
+  metrics.totals.requests = 0;
+  metrics.totals.allow = 0;
+  metrics.totals.deny = 0;
+  metrics.denyByCode = {};
+  saveMetrics(metrics);
+  return getMetricsSnapshot();
+}

@@ -7,6 +7,7 @@ npm install
 npm run compile
 $env:RUNTIME_AUDIENCE="rp.example"
 $env:LOCAL_TEST_KEYS="1"
+$env:ALLOW_DEV_RESET="1"
 npm start
 ```
 
@@ -14,6 +15,7 @@ Server runs on `http://localhost:8080`.
 
 Open in browser:
 - `http://localhost:8080/` (service info)
+- `http://localhost:8080/dashboard` (simple local dashboard)
 - `http://localhost:8080/health`
 - `http://localhost:8080/metrics`
 
@@ -31,6 +33,12 @@ Invoke-WebRequest -UseBasicParsing http://localhost:8080/metrics | Select-Object
 ```powershell
 Invoke-WebRequest -UseBasicParsing http://localhost:8080/metrics.csv | Select-Object -ExpandProperty Content
 ```
+
+## DEV reset metrics
+```powershell
+Invoke-WebRequest -UseBasicParsing http://localhost:8080/metrics/reset | Select-Object -ExpandProperty Content
+```
+(works only when `ALLOW_DEV_RESET=1`)
 
 ## ALLOW path test (signed request)
 1) Generate signed request:
