@@ -38,4 +38,7 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `17_API_Contract_v0.md` — requester/verifier contract draft for MVP
 - `18_Test_Plan_Adversarial_and_E2E.md` — adversarial + E2E test strategy
 - `19_Data_Retention_Matrix.md` — field-level retention and purge policy
+- `20_Canonicalization_and_Binding_Spec_v0.md` — deterministic binding + anti-replay spec
+- `21_Deny_Reason_Code_Catalog.md` — normative deny code source of truth
+- `22_Pilot_Go_NoGo_Template.md` — formal pilot decision template
 - `WHAT_MITCH_IS_NOT.md` — guardrails / positioning
