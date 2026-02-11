@@ -45,4 +45,6 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `24_Repo_Setup_and_GitHub_Linking.md` — current git/remote status + linking steps
 - `25_Sprint_1_Task_Board.md` — week-1 execution board with acceptance criteria
 - `26_Repository_Hygiene_Plan.md` — cleanup plan for dependency/build artifacts
+- `27_ADR_Closure_Record.md` — accepted MVP architecture decisions (binding)
+- `28_Test_Vector_Pack_v0.md` — canonicalization/binding normative vectors
 - `WHAT_MITCH_IS_NOT.md` — guardrails / positioning
