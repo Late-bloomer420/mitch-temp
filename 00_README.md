@@ -51,4 +51,6 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `30_First_Code_Tasks.md` — immediate implementation backlog (top 10)
 - `31_Interface_Definitions_v0.md` — internal contracts for parallel implementation
 - `32_Config_Profile_v0.md` — safe runtime defaults and config shape
+- `33_Business_Case_01_Age_Verification.md` — first business case definition (ICP/value/KPI)
+- `34_Use_Case_Prioritization_Matrix.md` — weighted use-case selection matrix
 - `WHAT_MITCH_IS_NOT.md` — guardrails / positioning
