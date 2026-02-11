@@ -29,6 +29,8 @@ export interface VerificationRequestV0 {
     reAuthAssertion?: string;
     reAuthChallenge?: string;
     reAuthIssuedAt?: string;
+    reAuthRpId?: string;
+    reAuthOrigin?: string;
   };
 }
 

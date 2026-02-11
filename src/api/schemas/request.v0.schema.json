@@ -72,7 +72,9 @@
         "reAuthMethod": { "enum": ["webauthn", "other"] },
         "reAuthAssertion": { "type": "string", "minLength": 1 },
         "reAuthChallenge": { "type": "string", "minLength": 1 },
-        "reAuthIssuedAt": { "type": "string", "format": "date-time" }
+        "reAuthIssuedAt": { "type": "string", "format": "date-time" },
+        "reAuthRpId": { "type": "string", "minLength": 1 },
+        "reAuthOrigin": { "type": "string", "minLength": 1 }
       },
       "additionalProperties": false
     }

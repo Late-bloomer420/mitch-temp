@@ -55,6 +55,8 @@ Optional strong re-auth scaffold (WebAuthn integration hook):
 - `REQUIRE_STRONG_REAUTH=1`
 - `WEBAUTHN_ASSERTION_ALLOWLIST=assertion-token-1,assertion-token-2`
 - `WEBAUTHN_CHALLENGE_ALLOWLIST=challenge-1,challenge-2`
+- `WEBAUTHN_RPID_ALLOWLIST=rp.example`
+- `WEBAUTHN_ORIGIN_ALLOWLIST=https://rp.example`
 - `WEBAUTHN_MAX_AGE_SECONDS=120`
 - WebAuthn challenges are treated as one-time-use within the freshness window.
 - request metadata should include:

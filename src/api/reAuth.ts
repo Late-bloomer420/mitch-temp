@@ -12,6 +12,8 @@ export function hasStrongRecentReAuth(meta?: {
   reAuthAssertion?: string;
   reAuthChallenge?: string;
   reAuthIssuedAt?: string;
+  reAuthRpId?: string;
+  reAuthOrigin?: string;
 }): { ok: boolean; invalidEvidence: boolean } {
   if (!meta) return { ok: false, invalidEvidence: false };
 
@@ -27,7 +29,7 @@ export function hasStrongRecentReAuth(meta?: {
     return { ok: false, invalidEvidence: true };
   }
 
-  if (!meta.reAuthChallenge || !meta.reAuthIssuedAt) {
+  if (!meta.reAuthChallenge || !meta.reAuthIssuedAt || !meta.reAuthRpId || !meta.reAuthOrigin) {
     return { ok: false, invalidEvidence: true };
   }
 
@@ -52,8 +54,20 @@ export function hasStrongRecentReAuth(meta?: {
     .map((s) => s.trim())
     .filter(Boolean);
 
+  const allowRpIds = (process.env.WEBAUTHN_RPID_ALLOWLIST ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  const allowOrigins = (process.env.WEBAUTHN_ORIGIN_ALLOWLIST ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
   const assertionOk = allowAssertions.includes(meta.reAuthAssertion);
   const challengeOk = allowChallenges.includes(meta.reAuthChallenge);
+  const rpIdOk = allowRpIds.includes(meta.reAuthRpId);
+  const originOk = allowOrigins.includes(meta.reAuthOrigin);
 
   const now = Date.now();
   pruneUsedChallenges(now);
@@ -64,7 +78,7 @@ export function hasStrongRecentReAuth(meta?: {
     return { ok: false, invalidEvidence: true };
   }
 
-  if (assertionOk && challengeOk) {
+  if (assertionOk && challengeOk && rpIdOk && originOk) {
     const challengeTtlMs = maxAgeSeconds * 1000;
     usedWebauthnChallenges.set(meta.reAuthChallenge, now + challengeTtlMs);
     return { ok: true, invalidEvidence: true };

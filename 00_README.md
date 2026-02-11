@@ -105,6 +105,7 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `77_StatusList_Reference_Validation_v3_Light.md` - secure URL/index validation for status-list references
 - `78_WebAuthn_Strong_ReAuth_Window_v2.md` - stronger re-auth checks with challenge and freshness window
 - `79_WebAuthn_Challenge_Replay_Protection.md` - one-time challenge reuse protection for strong re-auth
+- `80_WebAuthn_RPID_Origin_Binding_v3.md` - RP-ID and origin binding checks for strict re-auth
 - `src/tools/kpiCheckCli.ts` - CLI check for KPI thresholds (`npm run kpi:check`)
 - `src/api/metrics.ts` - in-service counters for basic KPI telemetry (`GET /metrics`)
 - `src/api/eventLog.ts` + `src/api/kpi.ts` - structured audit events and derived KPI snapshot (`GET /kpi`)

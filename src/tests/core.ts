@@ -306,6 +306,8 @@ async function run(): Promise<void> {
   process.env.REQUIRE_STRONG_REAUTH = "1";
   process.env.WEBAUTHN_ASSERTION_ALLOWLIST = "assert-ok-1";
   process.env.WEBAUTHN_CHALLENGE_ALLOWLIST = "challenge-ok-1";
+  process.env.WEBAUTHN_RPID_ALLOWLIST = "rp.example";
+  process.env.WEBAUTHN_ORIGIN_ALLOWLIST = "https://rp.example";
   process.env.WEBAUTHN_MAX_AGE_SECONDS = "120";
   resetProofFatigue();
   resetRateLimiter();
@@ -318,12 +320,26 @@ async function run(): Promise<void> {
   const weakReauthRes = await verifyRequest(weakReauthReq, policy, "rp.example", resolveKey);
   assert.equal(weakReauthRes.decisionCode, "DENY_REAUTH_PROOF_INVALID");
 
+  const wrongOriginReq = buildRequest();
+  wrongOriginReq.meta = {
+    reAuthMethod: "webauthn",
+    reAuthAssertion: "assert-ok-1",
+    reAuthChallenge: "challenge-ok-1",
+    reAuthIssuedAt: new Date().toISOString(),
+    reAuthRpId: "rp.example",
+    reAuthOrigin: "https://evil.example",
+  };
+  const wrongOriginRes = await verifyRequest(wrongOriginReq, policy, "rp.example", resolveKey);
+  assert.equal(wrongOriginRes.decisionCode, "DENY_REAUTH_PROOF_INVALID");
+
   const staleReauthReq = buildRequest();
   staleReauthReq.meta = {
     reAuthMethod: "webauthn",
     reAuthAssertion: "assert-ok-1",
     reAuthChallenge: "challenge-ok-1",
     reAuthIssuedAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+    reAuthRpId: "rp.example",
+    reAuthOrigin: "https://rp.example",
   };
   const staleReauthRes = await verifyRequest(staleReauthReq, policy, "rp.example", resolveKey);
   assert.equal(staleReauthRes.decisionCode, "DENY_REAUTH_PROOF_INVALID");
@@ -334,6 +350,8 @@ async function run(): Promise<void> {
     reAuthAssertion: "assert-ok-1",
     reAuthChallenge: "challenge-ok-1",
     reAuthIssuedAt: new Date().toISOString(),
+    reAuthRpId: "rp.example",
+    reAuthOrigin: "https://rp.example",
   };
   const strongReauthRes = await verifyRequest(strongReauthReq, policy, "rp.example", resolveKey);
   assert.equal(strongReauthRes.decision, "ALLOW");
@@ -345,6 +363,8 @@ async function run(): Promise<void> {
     reAuthAssertion: "assert-ok-1",
     reAuthChallenge: "challenge-ok-1",
     reAuthIssuedAt: new Date().toISOString(),
+    reAuthRpId: "rp.example",
+    reAuthOrigin: "https://rp.example",
   };
   const replayChallengeRes = await verifyRequest(replayChallengeReq, policy, "rp.example", resolveKey);
   assert.equal(replayChallengeRes.decisionCode, "DENY_REAUTH_PROOF_INVALID");
