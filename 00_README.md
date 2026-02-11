@@ -53,4 +53,7 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `32_Config_Profile_v0.md` — safe runtime defaults and config shape
 - `33_Business_Case_01_Age_Verification.md` — first business case definition (ICP/value/KPI)
 - `34_Use_Case_Prioritization_Matrix.md` — weighted use-case selection matrix
+- `35_Product_Architecture_Layers.md` — scope-safe layering (Core/Shield/Orchestrator)
+- `36_Phase2_Shield_and_AI_Orchestration_Roadmap.md` — future expansion roadmap after Core MVP
+- `37_Privacy_Policy_Language_for_Web_and_AI.md` — shared policy grammar concept for web+AI controls
 - `WHAT_MITCH_IS_NOT.md` — guardrails / positioning
