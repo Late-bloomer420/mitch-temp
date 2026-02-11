@@ -44,6 +44,7 @@ export function getKpiSnapshot(): Record<string, number> {
 
   const adjudications = events.filter((e) => e.eventType === "adjudication_recorded");
   const falseDenies = adjudications.filter((e) => e.details?.outcome === "false_deny").length;
+  const falseAllows = adjudications.filter((e) => e.details?.outcome === "false_allow").length;
   const legitAdjudications = adjudications.filter((e) => e.details?.outcome === "legit" || e.details?.outcome === "false_deny").length;
 
   const overrides = events.filter((e) => e.eventType === "decision_override").length;
@@ -71,6 +72,7 @@ export function getKpiSnapshot(): Record<string, number> {
     verification_success_rate: total > 0 ? allows / total : 0,
     replay_block_rate: replayAttempts > 0 ? replayDenies / replayAttempts : 1,
     false_deny_rate: legitAdjudications > 0 ? falseDenies / legitAdjudications : 0,
+    false_allow_total: falseAllows,
     policy_override_rate: total > 0 ? overrides / total : 0,
     deny_credential_revoked_total: denyCredentialRevoked,
     deny_status_source_unavailable_total: denyStatusSourceUnavailable,

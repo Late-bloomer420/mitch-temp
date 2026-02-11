@@ -7,6 +7,14 @@ Define simple, actionable alert thresholds for pilot operations.
 
 ## KPI signals and thresholds
 
+### 0) Trust-break event (highest priority)
+- Signal: `false_allow_total`
+- Critical: `> 0` (zero-tolerance)
+- Action:
+  1. Immediate incident response (containment + root-cause)
+  2. Notify pilot stakeholders and freeze risky rollout paths
+  3. Add regression test before resuming normal operations
+
 ### 1) Status source degradation
 - Signal: `deny_status_source_unavailable_rate`
 - Warning: `> 0.05` over last review window

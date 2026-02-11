@@ -34,6 +34,7 @@ function run(): void {
   const cacheHits = Number(kpi.revoked_cache_hit_total ?? 0);
   const cacheStores = Number(kpi.revoked_cache_store_total ?? 0);
   const revokedTotal = Number(kpi.deny_credential_revoked_total ?? 0);
+  const falseAllowTotal = Number(kpi.false_allow_total ?? 0);
   const reauthInvalidTotal = Number(kpi.deny_reauth_proof_invalid_total ?? 0);
   const denyResolverQuorumFailed = Number(kpi.deny_resolver_quorum_failed_total ?? 0);
   const resolverQuorumFailures = Number(kpi.resolver_quorum_failures_total ?? 0);
@@ -49,6 +50,10 @@ function run(): void {
 
   if (cacheStores > 0 && cacheHits > cacheStores * 10) {
     issues.push(`WARNING: revoked cache hit/store skew high (${cacheHits}/${cacheStores})`);
+  }
+
+  if (falseAllowTotal > 0) {
+    issues.push(`CRITICAL: false_allow_total=${falseAllowTotal} > 0`);
   }
 
   if (resolverInconsistent > t.critResolverInconsistentTotal) {
@@ -89,6 +94,7 @@ function run(): void {
       revoked_cache_hit_total: cacheHits,
       revoked_cache_store_total: cacheStores,
       deny_credential_revoked_total: revokedTotal,
+      false_allow_total: falseAllowTotal,
       deny_reauth_proof_invalid_total: reauthInvalidTotal,
       deny_resolver_quorum_failed_total: denyResolverQuorumFailed,
       resolver_quorum_failures_total: resolverQuorumFailures,

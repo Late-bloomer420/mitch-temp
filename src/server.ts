@@ -127,6 +127,7 @@ const server = createServer(async (req, res) => {
 <li><b>deny_reauth_proof_invalid_total:</b> ${k.deny_reauth_proof_invalid_total ?? 0}</li>
 <li><b>deny_resolver_quorum_failed_total:</b> ${k.deny_resolver_quorum_failed_total ?? 0}</li>
 <li><b>deny_status_source_unavailable_rate:</b> ${k.deny_status_source_unavailable_rate ?? 0}</li>
+<li><b>false_allow_total:</b> ${k.false_allow_total ?? 0}</li>
 <li><b>revoked_cache_hit_total:</b> ${k.revoked_cache_hit_total ?? 0}</li>
 <li><b>revoked_cache_store_total:</b> ${k.revoked_cache_store_total ?? 0}</li>
 <li><b>resolver_queries_total:</b> ${k.resolver_queries_total ?? 0}</li>
