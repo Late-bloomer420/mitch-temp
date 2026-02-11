@@ -1,6 +1,6 @@
 export type CredentialStatusCheck =
   | { ok: true; revoked: boolean }
-  | { ok: false; reason: "credential_status_unavailable" };
+  | { ok: false; reason: "credential_status_unavailable" | "credential_status_invalid" };
 
 const revokedCacheById = new Map<string, number>();
 const revokedCacheByIndex = new Map<string, number>();
@@ -21,6 +21,21 @@ function parseRevokedIds(value?: string): Set<string> {
 
 function getRevokedCacheTtlMs(): number {
   return Number(process.env.CREDENTIAL_STATUS_REVOKED_CACHE_TTL_MS ?? 10000);
+}
+
+function isValidStatusListUrl(url: string): boolean {
+  try {
+    const u = new URL(url);
+    if (u.protocol === "https:") return true;
+    if (process.env.ALLOW_INSECURE_STATUS_URL === "1" && u.protocol === "http:") return true;
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+function isValidStatusListIndex(index: string): boolean {
+  return /^\d+$/.test(index);
 }
 
 function getRevokedCacheMaxEntries(): number {
@@ -146,14 +161,22 @@ export async function checkCredentialRevocation(
 ): Promise<CredentialStatusCheck> {
   if (!credentialId && !credentialStatus) return { ok: true, revoked: false };
 
-  // StatusList2021 shape scaffold (validation/transport readiness)
+  // StatusList2021 light validation (shape + reference sanity)
   if (credentialStatus) {
     if (
       credentialStatus.type !== "StatusList2021Entry" ||
       !credentialStatus.statusListCredential ||
       !credentialStatus.statusListIndex
     ) {
-      return { ok: false, reason: "credential_status_unavailable" };
+      return { ok: false, reason: "credential_status_invalid" };
+    }
+
+    if (!isValidStatusListUrl(credentialStatus.statusListCredential)) {
+      return { ok: false, reason: "credential_status_invalid" };
+    }
+
+    if (!isValidStatusListIndex(credentialStatus.statusListIndex)) {
+      return { ok: false, reason: "credential_status_invalid" };
     }
   }
 

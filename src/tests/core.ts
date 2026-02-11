@@ -246,9 +246,20 @@ async function run(): Promise<void> {
     // missing statusListIndex
   } as unknown as VerificationRequestV0["proofBundle"]["credentialStatus"];
   const malformedStatusRes = await verifyRequest(malformedStatusReq, policy, "rp.example", resolveKey);
-  assert.equal(malformedStatusRes.decisionCode, "DENY_STATUS_SOURCE_UNAVAILABLE");
+  assert.equal(malformedStatusRes.decisionCode, "DENY_CREDENTIAL_STATUS_INVALID");
 
-  // 10) StatusList2021 index revoke (env mode)
+  // 10) invalid StatusList2021 URL/index should deny as invalid
+  const invalidStatusRefReq = buildRequest();
+  invalidStatusRefReq.proofBundle.credentialStatus = {
+    type: "StatusList2021Entry",
+    statusListCredential: "http://status.example/list/1",
+    statusListIndex: "not-a-number",
+  };
+  const invalidStatusRefRes = await verifyRequest(invalidStatusRefReq, policy, "rp.example", resolveKey);
+  assert.equal(invalidStatusRefRes.decisionCode, "DENY_CREDENTIAL_STATUS_INVALID");
+
+  // 11) StatusList2021 index revoke (env mode)
+  resetRateLimiter();
   process.env.CREDENTIAL_STATUS_MODE = "env";
   process.env.REVOKED_STATUS_LIST_INDEXES = "42,99";
   const revokedIndexReq = buildRequest();
