@@ -123,6 +123,7 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `95_WebAuthn_Native_Verifier_Hook_v1.md` - verifier interface hook for future native authenticator checks
 - `96_WebAuthn_Native_Hook_Bound_Adapter_Evidence.md` - native hook now requires request-bound cryptographic adapter evidence
 - `97_WebAuthn_Config_Health_Guardrail.md` - KPI/check guardrail for strong re-auth config health
+- `98_WebAuthn_Native_Mode_Usage_Visibility.md` - KPI/dashboard/check visibility for native mode posture
 - `src/tools/kpiCheckCli.ts` - CLI check for KPI thresholds (`npm run kpi:check`)
 - `src/api/metrics.ts` - in-service counters for basic KPI telemetry (`GET /metrics`)
 - `src/api/eventLog.ts` + `src/api/kpi.ts` - structured audit events and derived KPI snapshot (`GET /kpi`)

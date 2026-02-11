@@ -140,6 +140,7 @@ const server = createServer(async (req, res) => {
 <li><b>crypto_allowed_algs_count:</b> ${k.crypto_allowed_algs_count ?? 0}</li>
 <li><b>reauth_strong_enabled:</b> ${k.reauth_strong_enabled ?? 0}</li>
 <li><b>webauthn_verify_mode_code:</b> ${k.webauthn_verify_mode_code ?? 0}</li>
+<li><b>webauthn_native_mode_enabled:</b> ${k.webauthn_native_mode_enabled ?? 0}</li>
 <li><b>webauthn_secret_config_valid:</b> ${k.webauthn_secret_config_valid ?? 0}</li>
 <li><b>estimated_monthly_verification_volume:</b> ${k.estimated_monthly_verification_volume ?? 0}</li>
 <li><b>estimated_fixed_monthly_cost_eur:</b> ${k.estimated_fixed_monthly_cost_eur ?? 0}</li>

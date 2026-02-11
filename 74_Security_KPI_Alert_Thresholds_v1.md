@@ -25,6 +25,13 @@ Define simple, actionable alert thresholds for pilot operations.
   1. Fix missing/invalid WebAuthn secret config immediately
   2. Re-run `kpi:check` and verify critical clears
 
+### 0c) Native mode posture mismatch
+- Signal: `webauthn_native_mode_enabled = 1` with `reauth_strong_enabled != 1`
+- Warning: any occurrence
+- Action:
+  1. Align native mode usage with strong re-auth policy
+  2. Confirm this is intentional in runtime profile
+
 ### 1) Status source degradation
 - Signal: `deny_status_source_unavailable_rate`
 - Warning: `> 0.05` over last review window

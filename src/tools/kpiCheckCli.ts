@@ -44,6 +44,7 @@ function run(): void {
   const estimatedMonthlyRunCost = Number(kpi.estimated_monthly_run_cost_eur ?? 0);
   const reauthStrongEnabled = Number(kpi.reauth_strong_enabled ?? 0);
   const webauthnModeCode = Number(kpi.webauthn_verify_mode_code ?? 0);
+  const webauthnNativeModeEnabled = Number(kpi.webauthn_native_mode_enabled ?? 0);
   const webauthnSecretConfigValid = Number(kpi.webauthn_secret_config_valid ?? 1);
 
   const issues: string[] = [];
@@ -64,6 +65,10 @@ function run(): void {
 
   if (reauthStrongEnabled === 1 && webauthnModeCode > 0 && webauthnSecretConfigValid === 0) {
     issues.push("CRITICAL: strong re-auth enabled but WebAuthn secret config is invalid");
+  }
+
+  if (webauthnNativeModeEnabled === 1 && reauthStrongEnabled !== 1) {
+    issues.push("WARNING: WebAuthn native mode enabled while strong re-auth is not enabled");
   }
 
   if (resolverInconsistent > t.critResolverInconsistentTotal) {
@@ -113,6 +118,7 @@ function run(): void {
       crypto_allowed_algs_count: cryptoAllowedAlgsCount,
       reauth_strong_enabled: reauthStrongEnabled,
       webauthn_verify_mode_code: webauthnModeCode,
+      webauthn_native_mode_enabled: webauthnNativeModeEnabled,
       webauthn_secret_config_valid: webauthnSecretConfigValid,
       estimated_monthly_run_cost_eur: estimatedMonthlyRunCost,
     },

@@ -74,6 +74,7 @@ export function getKpiSnapshot(): Record<string, number> {
   const reauthStrongEnabled = process.env.REQUIRE_STRONG_REAUTH === "1" ? 1 : 0;
   const webauthnMode = (process.env.WEBAUTHN_VERIFY_MODE ?? "allowlist").toLowerCase();
   const webauthnModeCode = webauthnMode === "native" ? 2 : webauthnMode === "signed" ? 1 : 0;
+  const webauthnNativeModeEnabled = webauthnModeCode === 2 ? 1 : 0;
   const hasSignedSecret = (process.env.WEBAUTHN_ASSERTION_HMAC_SECRET ?? "").length > 0;
   const hasNativeSecret = (process.env.WEBAUTHN_NATIVE_ADAPTER_SECRET ?? "").length > 0;
   const webauthnSecretConfigValid =
@@ -107,6 +108,7 @@ export function getKpiSnapshot(): Record<string, number> {
     crypto_allowed_algs_count: allowedAlgsCount,
     reauth_strong_enabled: reauthStrongEnabled,
     webauthn_verify_mode_code: webauthnModeCode,
+    webauthn_native_mode_enabled: webauthnNativeModeEnabled,
     webauthn_secret_config_valid: webauthnSecretConfigValid,
     estimated_monthly_verification_volume: Math.max(0, estimatedMonthlyVerificationVolume),
     estimated_fixed_monthly_cost_eur: estimatedFixedMonthlyCost,
