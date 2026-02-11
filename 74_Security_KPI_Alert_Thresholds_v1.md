@@ -35,6 +35,14 @@ Define simple, actionable alert thresholds for pilot operations.
   2. Confirm revocation source integrity
   3. Inform pilot stakeholders if impact is broad
 
+### 4) WebAuthn evidence drift
+- Signal: `deny_reauth_proof_invalid_total`
+- Warning: sustained increase over baseline
+- Action:
+  1. Check RP-ID/origin/challenge/age config alignment
+  2. Validate strict-mode metadata generation in clients
+  3. Review recent re-auth policy/config changes
+
 ## Operational notes
 - Evaluate thresholds per rolling window (e.g., 15-60 min) rather than raw lifetime totals.
 - `kpi:check` behavior can be tuned with `KPI_FAIL_ON_WARNING` (default soft-fail on warnings).

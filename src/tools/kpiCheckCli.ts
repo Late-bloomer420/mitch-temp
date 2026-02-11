@@ -22,6 +22,7 @@ function run(): void {
   const cacheHits = Number(kpi.revoked_cache_hit_total ?? 0);
   const cacheStores = Number(kpi.revoked_cache_store_total ?? 0);
   const revokedTotal = Number(kpi.deny_credential_revoked_total ?? 0);
+  const reauthInvalidTotal = Number(kpi.deny_reauth_proof_invalid_total ?? 0);
 
   const issues: string[] = [];
 
@@ -43,6 +44,7 @@ function run(): void {
       revoked_cache_hit_total: cacheHits,
       revoked_cache_store_total: cacheStores,
       deny_credential_revoked_total: revokedTotal,
+      deny_reauth_proof_invalid_total: reauthInvalidTotal,
     },
     issues,
     ok: issues.length === 0,

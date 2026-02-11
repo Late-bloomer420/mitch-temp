@@ -53,6 +53,7 @@ export function getKpiSnapshot(): Record<string, number> {
   const denyCredentialRevoked = decisions.filter((e) => e.decisionCode === "DENY_CREDENTIAL_REVOKED").length;
   const denyStatusSourceUnavailable = decisions.filter((e) => e.decisionCode === "DENY_STATUS_SOURCE_UNAVAILABLE").length;
   const denyJurisdictionIncompatible = decisions.filter((e) => e.decisionCode === "DENY_JURISDICTION_INCOMPATIBLE").length;
+  const denyReauthProofInvalid = decisions.filter((e) => e.decisionCode === "DENY_REAUTH_PROOF_INVALID").length;
 
   const latencies = decisions
     .map((e) => e.latencyMs)
@@ -71,6 +72,7 @@ export function getKpiSnapshot(): Record<string, number> {
     deny_credential_revoked_total: denyCredentialRevoked,
     deny_status_source_unavailable_total: denyStatusSourceUnavailable,
     deny_jurisdiction_incompatible_total: denyJurisdictionIncompatible,
+    deny_reauth_proof_invalid_total: denyReauthProofInvalid,
     deny_status_source_unavailable_rate: denies > 0 ? denyStatusSourceUnavailable / denies : 0,
     revoked_cache_hit_total: cache.revoked_cache_hit_total,
     revoked_cache_store_total: cache.revoked_cache_store_total,
