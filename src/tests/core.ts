@@ -1,6 +1,6 @@
 import assert from "assert";
 import { createServer } from "http";
-import { generateKeyPairSync, sign } from "crypto";
+import { createHmac, generateKeyPairSync, sign } from "crypto";
 import { verifyRequest } from "../api/verifierRoutes";
 import { computeRequestHash } from "../binding/requestHash";
 import { VerificationRequestV0 } from "../types/api";
@@ -12,6 +12,11 @@ import { resetReAuthState } from "../api/reAuth";
 
 function b64u(buffer: Buffer): string {
   return buffer.toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+function signReAuthAssertion(challenge: string, rpId: string, origin: string, issuedAt: string, secret: string): string {
+  const payload = `${challenge}|${rpId}|${origin}|${issuedAt}`;
+  return b64u(createHmac("sha256", secret).update(payload).digest());
 }
 
 const policy: PolicyManifestV0 = {
@@ -374,6 +379,37 @@ async function run(): Promise<void> {
   };
   const replayChallengeRes = await verifyRequest(replayChallengeReq, policy, "rp.example", resolveKey);
   assert.equal(replayChallengeRes.decisionCode, "DENY_REAUTH_PROOF_INVALID");
+
+  // 13b) signed re-auth mode (cryptographic scaffold)
+  resetReAuthState();
+  process.env.WEBAUTHN_VERIFY_MODE = "signed";
+  process.env.WEBAUTHN_ASSERTION_HMAC_SECRET = "secret-demo-1";
+
+  await verifyRequest(buildRequest(), policy, "rp.example", resolveKey);
+  await verifyRequest(buildRequest(), policy, "rp.example", resolveKey);
+
+  const signedIssuedAt = new Date().toISOString();
+  const signedAssertion = signReAuthAssertion(
+    "challenge-ok-1",
+    "rp.example",
+    "https://rp.example",
+    signedIssuedAt,
+    "secret-demo-1"
+  );
+  const signedReauthReq = buildRequest();
+  signedReauthReq.meta = {
+    reAuthMethod: "webauthn",
+    reAuthAssertion: signedAssertion,
+    reAuthChallenge: "challenge-ok-1",
+    reAuthIssuedAt: signedIssuedAt,
+    reAuthRpId: "rp.example",
+    reAuthOrigin: "https://rp.example",
+  };
+  const signedReauthRes = await verifyRequest(signedReauthReq, policy, "rp.example", resolveKey);
+  assert.equal(signedReauthRes.decision, "ALLOW");
+
+  delete process.env.WEBAUTHN_VERIFY_MODE;
+  delete process.env.WEBAUTHN_ASSERTION_HMAC_SECRET;
 
   delete process.env.REQUIRE_STRONG_REAUTH;
   delete process.env.WEBAUTHN_ASSERTION_ALLOWLIST;

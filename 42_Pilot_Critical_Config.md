@@ -64,6 +64,8 @@ Optional strong re-auth scaffold (WebAuthn integration hook):
 - `WEBAUTHN_RPID_ALLOWLIST=rp.example`
 - `WEBAUTHN_ORIGIN_ALLOWLIST=https://rp.example`
 - `WEBAUTHN_MAX_AGE_SECONDS=120`
+- `WEBAUTHN_VERIFY_MODE=allowlist|signed` (default: `allowlist`)
+- `WEBAUTHN_ASSERTION_HMAC_SECRET=<secret>` (required for `signed` mode)
 - WebAuthn challenges are treated as one-time-use within the freshness window.
 - request metadata should include:
   - `meta.reAuthMethod=webauthn`

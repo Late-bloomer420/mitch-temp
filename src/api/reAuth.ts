@@ -1,8 +1,35 @@
+import { createHmac, timingSafeEqual } from "crypto";
+
 const usedWebauthnChallenges = new Map<string, number>();
 
 function pruneUsedChallenges(now: number): void {
   for (const [k, exp] of usedWebauthnChallenges.entries()) {
     if (exp <= now) usedWebauthnChallenges.delete(k);
+  }
+}
+
+function b64u(input: Buffer): string {
+  return input.toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+function verifySignedAssertion(
+  assertion: string,
+  challenge: string,
+  rpId: string,
+  origin: string,
+  issuedAt: string,
+  secret: string
+): boolean {
+  const payload = `${challenge}|${rpId}|${origin}|${issuedAt}`;
+  const expected = b64u(createHmac("sha256", secret).update(payload).digest());
+
+  try {
+    const a = Buffer.from(assertion, "utf8");
+    const b = Buffer.from(expected, "utf8");
+    if (a.length !== b.length) return false;
+    return timingSafeEqual(a, b);
+  } catch {
+    return false;
   }
 }
 
@@ -44,11 +71,6 @@ export function hasStrongRecentReAuth(meta?: {
     return { ok: false, invalidEvidence: true };
   }
 
-  const allowAssertions = (process.env.WEBAUTHN_ASSERTION_ALLOWLIST ?? "")
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
-
   const allowChallenges = (process.env.WEBAUTHN_CHALLENGE_ALLOWLIST ?? "")
     .split(",")
     .map((s) => s.trim())
@@ -64,10 +86,31 @@ export function hasStrongRecentReAuth(meta?: {
     .map((s) => s.trim())
     .filter(Boolean);
 
-  const assertionOk = allowAssertions.includes(meta.reAuthAssertion);
+  const verifyMode = (process.env.WEBAUTHN_VERIFY_MODE ?? "allowlist").toLowerCase();
   const challengeOk = allowChallenges.includes(meta.reAuthChallenge);
   const rpIdOk = allowRpIds.includes(meta.reAuthRpId);
   const originOk = allowOrigins.includes(meta.reAuthOrigin);
+
+  let assertionOk = false;
+  if (verifyMode === "signed") {
+    const secret = process.env.WEBAUTHN_ASSERTION_HMAC_SECRET ?? "";
+    if (secret.length > 0) {
+      assertionOk = verifySignedAssertion(
+        meta.reAuthAssertion,
+        meta.reAuthChallenge,
+        meta.reAuthRpId,
+        meta.reAuthOrigin,
+        meta.reAuthIssuedAt,
+        secret
+      );
+    }
+  } else {
+    const allowAssertions = (process.env.WEBAUTHN_ASSERTION_ALLOWLIST ?? "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    assertionOk = allowAssertions.includes(meta.reAuthAssertion);
+  }
 
   const now = Date.now();
   pruneUsedChallenges(now);
