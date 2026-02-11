@@ -415,6 +415,71 @@ async function run(): Promise<void> {
   const signedReauthRes = await verifyRequest(signedReauthReq, policy, "rp.example", resolveKey);
   assert.equal(signedReauthRes.decision, "ALLOW");
 
+  // signed mode must reject native-context signatures
+  resetRateLimiter();
+  const signedModeNativeContextIssuedAt = new Date().toISOString();
+  const signedModeNativeContextAssertion = signReAuthAssertion(
+    "challenge-ok-1",
+    "rp.example",
+    "https://rp.example",
+    signedModeNativeContextIssuedAt,
+    "secret-demo-1",
+    "native"
+  );
+  const signedModeNativeContextReq = buildRequest();
+  signedModeNativeContextReq.meta = {
+    reAuthMethod: "webauthn",
+    reAuthAssertion: signedModeNativeContextAssertion,
+    reAuthChallenge: "challenge-ok-1",
+    reAuthIssuedAt: signedModeNativeContextIssuedAt,
+    reAuthRpId: "rp.example",
+    reAuthOrigin: "https://rp.example",
+  };
+  const signedModeNativeContextRes = await verifyRequest(signedModeNativeContextReq, policy, "rp.example", resolveKey);
+  assert.equal(signedModeNativeContextRes.decisionCode, "DENY_REAUTH_PROOF_INVALID");
+
+  // signed mode challenge replay must deny
+  resetReAuthState();
+  const signedReplayIssuedAt1 = new Date().toISOString();
+  const signedReplayAssertion1 = signReAuthAssertion(
+    "challenge-ok-1",
+    "rp.example",
+    "https://rp.example",
+    signedReplayIssuedAt1,
+    "secret-demo-1"
+  );
+  const signedReplayReq1 = buildRequest();
+  signedReplayReq1.meta = {
+    reAuthMethod: "webauthn",
+    reAuthAssertion: signedReplayAssertion1,
+    reAuthChallenge: "challenge-ok-1",
+    reAuthIssuedAt: signedReplayIssuedAt1,
+    reAuthRpId: "rp.example",
+    reAuthOrigin: "https://rp.example",
+  };
+  const signedReplayRes1 = await verifyRequest(signedReplayReq1, policy, "rp.example", resolveKey);
+  assert.equal(signedReplayRes1.decision, "ALLOW");
+
+  const signedReplayIssuedAt2 = new Date().toISOString();
+  const signedReplayAssertion2 = signReAuthAssertion(
+    "challenge-ok-1",
+    "rp.example",
+    "https://rp.example",
+    signedReplayIssuedAt2,
+    "secret-demo-1"
+  );
+  const signedReplayReq2 = buildRequest();
+  signedReplayReq2.meta = {
+    reAuthMethod: "webauthn",
+    reAuthAssertion: signedReplayAssertion2,
+    reAuthChallenge: "challenge-ok-1",
+    reAuthIssuedAt: signedReplayIssuedAt2,
+    reAuthRpId: "rp.example",
+    reAuthOrigin: "https://rp.example",
+  };
+  const signedReplayRes2 = await verifyRequest(signedReplayReq2, policy, "rp.example", resolveKey);
+  assert.equal(signedReplayRes2.decisionCode, "DENY_REAUTH_PROOF_INVALID");
+
   // 13c) native verifier hook defaults to deny unless adapter evidence is cryptographically bound
   resetReAuthState();
   resetRateLimiter();
@@ -432,6 +497,28 @@ async function run(): Promise<void> {
   };
   const nativeDenied = await verifyRequest(nativeReq, policy, "rp.example", resolveKey);
   assert.equal(nativeDenied.decisionCode, "DENY_REAUTH_PROOF_INVALID");
+
+  // native mode must reject signed-context signatures
+  const nativeSignedContextIssuedAt = new Date().toISOString();
+  const nativeSignedContextAssertion = signReAuthAssertion(
+    "challenge-ok-1",
+    "rp.example",
+    "https://rp.example",
+    nativeSignedContextIssuedAt,
+    "native-secret-1",
+    "signed"
+  );
+  const nativeSignedContextReq = buildRequest();
+  nativeSignedContextReq.meta = {
+    reAuthMethod: "webauthn",
+    reAuthAssertion: nativeSignedContextAssertion,
+    reAuthChallenge: "challenge-ok-1",
+    reAuthIssuedAt: nativeSignedContextIssuedAt,
+    reAuthRpId: "rp.example",
+    reAuthOrigin: "https://rp.example",
+  };
+  const nativeSignedContextRes = await verifyRequest(nativeSignedContextReq, policy, "rp.example", resolveKey);
+  assert.equal(nativeSignedContextRes.decisionCode, "DENY_REAUTH_PROOF_INVALID");
 
   const nativeIssuedAt = new Date().toISOString();
   const nativeAssertion = signReAuthAssertion(

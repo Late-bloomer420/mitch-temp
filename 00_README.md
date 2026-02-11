@@ -127,6 +127,7 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `99_WebAuthn_Allowlist_Mode_Drift_Warning.md` - warning signal when strong re-auth still runs allowlist verification mode
 - `100_Security_Profile_Score_KPI_v1.md` - compact 0-100 security posture score in KPI/dashboard/checks
 - `101_WebAuthn_Native_Runtime_Usage_Metrics.md` - native WebAuthn runtime attempt/success/deny KPI visibility
+- `102_WebAuthn_Mismatch_and_Replay_Edge_Tests.md` - adversarial tests for signed/native context mismatch and challenge replay denial
 - `STATE.md` - single-screen current state (Now/Next/Later, blockers, safe runtime reminders)
 - `src/tools/kpiCheckCli.ts` - CLI check for KPI thresholds (`npm run kpi:check`)
 - `src/api/metrics.ts` - in-service counters for basic KPI telemetry (`GET /metrics`)

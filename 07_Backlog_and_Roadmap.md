@@ -70,7 +70,7 @@ This backlog replaces the old concept-only framing.
 ## 4) Immediate next batch queue (small autonomous batches)
 
 1. [x] Add WebAuthn native-mode metric for **actual usage events** (not only config posture)
-2. [ ] Add targeted test vectors for signed/native mismatch and replay edge cases
+2. [x] Add targeted test vectors for signed/native mismatch and replay edge cases
 3. [ ] Add doc: "security_profile_score interpretation + limitations" with runbook actions
 4. [ ] Start native verifier adapter interface contract (strict input/output and deny mapping)
 

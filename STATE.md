@@ -16,9 +16,9 @@ Stand: 2026-02-12
 - Note: score depends on runtime config and current telemetry; this is not an absolute security guarantee.
 
 ## Now (do next)
-1. Add focused tests for signed/native mismatch + replay edge cases
-2. Add doc/runbook for `security_profile_score` interpretation and operator actions
-3. Start strict native verifier adapter contract (input/output + deny mapping)
+1. Add doc/runbook for `security_profile_score` interpretation and operator actions
+2. Start strict native verifier adapter contract (input/output + deny mapping)
+3. Add kpi:check warning rule for sustained native deny rate spikes
 
 ## Next (short buffer)
 1. Start strict native verifier adapter contract (input/output + deny mapping)
