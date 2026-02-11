@@ -28,6 +28,10 @@ async function checkHttpStatus(
       headers: { Accept: "application/json" },
     });
     if (!res.ok) return { ok: false, reason: "credential_status_unavailable" };
+    const contentType = (res.headers.get("content-type") ?? "").toLowerCase();
+    if (!contentType.includes("application/json")) {
+      return { ok: false, reason: "credential_status_unavailable" };
+    }
     const data = (await res.json()) as { revokedCredentialIds?: unknown; revokedIndexes?: unknown };
 
     const hasRevokedIds = Object.prototype.hasOwnProperty.call(data, "revokedCredentialIds");

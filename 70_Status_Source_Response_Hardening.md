@@ -4,6 +4,7 @@ Stand: 2026-02-11
 
 ## Implemented
 - HTTP credential-status fetch now sends `Accept: application/json`.
+- Response `Content-Type` must include `application/json` (otherwise fail-closed).
 - Response payload shape is now validated:
   - must include at least one of: `revokedCredentialIds` or `revokedIndexes`
   - if present, each must be an array

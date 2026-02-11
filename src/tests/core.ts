@@ -147,6 +147,26 @@ async function run(): Promise<void> {
   delete process.env.CREDENTIAL_STATUS_URL;
   delete process.env.CREDENTIAL_STATUS_TIMEOUT_MS;
 
+  // 7g) status provider wrong content-type must fail closed
+  const wrongCtServer = createServer((_, res) => {
+    res.writeHead(200, { "Content-Type": "text/plain" });
+    res.end(JSON.stringify({ revokedCredentialIds: [] }));
+  });
+  await new Promise<void>((resolve) => wrongCtServer.listen(18082, resolve));
+
+  process.env.CREDENTIAL_STATUS_MODE = "http";
+  process.env.CREDENTIAL_STATUS_URL = "http://127.0.0.1:18082/revoked";
+  process.env.CREDENTIAL_STATUS_TIMEOUT_MS = "200";
+  const wrongCtReq = buildRequest();
+  wrongCtReq.proofBundle.credentialId = "cred-check-3";
+  const wrongCtRes = await verifyRequest(wrongCtReq, policy, "rp.example", resolveKey);
+  assert.equal(wrongCtRes.decisionCode, "DENY_STATUS_SOURCE_UNAVAILABLE");
+  await new Promise<void>((resolve, reject) => wrongCtServer.close((err) => (err ? reject(err) : resolve())));
+
+  delete process.env.CREDENTIAL_STATUS_MODE;
+  delete process.env.CREDENTIAL_STATUS_URL;
+  delete process.env.CREDENTIAL_STATUS_TIMEOUT_MS;
+
   // 8) jurisdiction incompatibility
   process.env.REQUIRE_JURISDICTION_MATCH = "1";
   process.env.RUNTIME_JURISDICTION = "EU";
