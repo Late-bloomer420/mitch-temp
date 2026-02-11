@@ -15,9 +15,20 @@ Clients must send:
 
 ## Key resolver for non-local mode
 - `LOCAL_TEST_KEYS=0`
+- `KEY_SOURCE_MODE=env|file|http`
+
+### env mode
 - `PUBLIC_KEYS_JSON={"kid-1":"-----BEGIN PUBLIC KEY-----..."}`
-- Optional revoked list:
-  - `REVOKED_KEY_IDS=kid-2,kid-3`
+
+### file mode
+- `KEY_SOURCE_FILE=./data/public-keys.json`
+
+### http mode
+- `KEY_SOURCE_URL=http://key-provider.local/keys`
+- `KEY_SOURCE_TIMEOUT_MS=1500`
+
+Optional revoked list:
+- `REVOKED_KEY_IDS=kid-2,kid-3`
 
 ## Safety defaults
 - `NODE_ENV=production` to disable dashboard/test endpoints

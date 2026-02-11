@@ -1,9 +1,9 @@
 import { ResolveKey } from "./keyResolver";
 import { StaticStatusProvider } from "./statusProvider";
-import { EnvKeySource } from "./keySource";
+import { createKeySource } from "./keySource";
 
 const statusProvider = new StaticStatusProvider();
-const keySource = new EnvKeySource();
+const keySource = createKeySource();
 
 export const envResolveKey: ResolveKey = async (keyId?: string) => {
   const status = await statusProvider.getStatus(keyId);

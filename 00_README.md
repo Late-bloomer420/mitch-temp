@@ -66,6 +66,7 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `41_Localhost_Test_Quickstart.md` — run/test instructions for local verifier service
 - `42_Pilot_Critical_Config.md` — required env config for protected pilot operation
 - `43_Pilot_Next_Steps_Plan.md` — immediate pilot hardening/evidence/execution plan
+- `src/proof/keySource.ts` + adapters (`file/http`) — pluggable key source strategy for pilot realism
 - `44_Evidence_Runbook.md` — reproducible scenario runbook for pilot evidence (B1)
 - `45_Adjudication_Workflow.md` — practical process to measure false-deny with real case classification
 - `src/api/metrics.ts` — in-service counters for basic KPI telemetry (`GET /metrics`)
