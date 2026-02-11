@@ -8,6 +8,7 @@ import { PolicyManifestV0 } from "../types/policy";
 import { ResolveKey } from "../proof/keyResolver";
 import { resetProofFatigue } from "../api/proofFatigue";
 import { resetRateLimiter } from "../api/rateLimiter";
+import { resetReAuthState } from "../api/reAuth";
 
 function b64u(buffer: Buffer): string {
   return buffer.toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
@@ -56,6 +57,7 @@ function buildRequest(): VerificationRequestV0 {
 async function run(): Promise<void> {
   resetRateLimiter();
   resetProofFatigue();
+  resetReAuthState();
 
   // 1) happy path
   const happy = await verifyRequest(buildRequest(), policy, "rp.example", resolveKey);
@@ -335,6 +337,17 @@ async function run(): Promise<void> {
   };
   const strongReauthRes = await verifyRequest(strongReauthReq, policy, "rp.example", resolveKey);
   assert.equal(strongReauthRes.decision, "ALLOW");
+
+  // replayed challenge must be denied
+  const replayChallengeReq = buildRequest();
+  replayChallengeReq.meta = {
+    reAuthMethod: "webauthn",
+    reAuthAssertion: "assert-ok-1",
+    reAuthChallenge: "challenge-ok-1",
+    reAuthIssuedAt: new Date().toISOString(),
+  };
+  const replayChallengeRes = await verifyRequest(replayChallengeReq, policy, "rp.example", resolveKey);
+  assert.equal(replayChallengeRes.decisionCode, "DENY_REAUTH_PROOF_INVALID");
 
   delete process.env.REQUIRE_STRONG_REAUTH;
   delete process.env.WEBAUTHN_ASSERTION_ALLOWLIST;

@@ -1,3 +1,11 @@
+const usedWebauthnChallenges = new Map<string, number>();
+
+function pruneUsedChallenges(now: number): void {
+  for (const [k, exp] of usedWebauthnChallenges.entries()) {
+    if (exp <= now) usedWebauthnChallenges.delete(k);
+  }
+}
+
 export function hasStrongRecentReAuth(meta?: {
   reAuthRecent?: boolean;
   reAuthMethod?: string;
@@ -47,5 +55,24 @@ export function hasStrongRecentReAuth(meta?: {
   const assertionOk = allowAssertions.includes(meta.reAuthAssertion);
   const challengeOk = allowChallenges.includes(meta.reAuthChallenge);
 
-  return { ok: assertionOk && challengeOk, invalidEvidence: true };
+  const now = Date.now();
+  pruneUsedChallenges(now);
+
+  // one-time challenge use (replay protection)
+  const challengeAlreadyUsed = usedWebauthnChallenges.has(meta.reAuthChallenge);
+  if (challengeAlreadyUsed) {
+    return { ok: false, invalidEvidence: true };
+  }
+
+  if (assertionOk && challengeOk) {
+    const challengeTtlMs = maxAgeSeconds * 1000;
+    usedWebauthnChallenges.set(meta.reAuthChallenge, now + challengeTtlMs);
+    return { ok: true, invalidEvidence: true };
+  }
+
+  return { ok: false, invalidEvidence: true };
+}
+
+export function resetReAuthState(): void {
+  usedWebauthnChallenges.clear();
 }
