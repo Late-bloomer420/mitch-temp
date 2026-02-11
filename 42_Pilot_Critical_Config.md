@@ -46,6 +46,11 @@ Operational behavior notes:
 - `HIGH_RISK_PURPOSES=medical_record_access,account_recovery,kyc_full_profile`
 - `SENSITIVE_CLAIMS=full_name,birth_date,address,national_id`
 
+Optional strong re-auth scaffold (WebAuthn integration hook):
+- `REQUIRE_STRONG_REAUTH=1`
+- `WEBAUTHN_ASSERTION_ALLOWLIST=assertion-token-1,assertion-token-2`
+- request metadata should include `meta.reAuthMethod=webauthn` + `meta.reAuthAssertion`
+
 ## Jurisdiction compatibility (optional strict mode)
 - `REQUIRE_JURISDICTION_MATCH=1`
 - `RUNTIME_JURISDICTION=EU`

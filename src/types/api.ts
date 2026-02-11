@@ -25,6 +25,8 @@ export interface VerificationRequestV0 {
     channel?: string;
     traceLevel?: "minimal" | "debug";
     reAuthRecent?: boolean;
+    reAuthMethod?: "webauthn" | "other";
+    reAuthAssertion?: string;
   };
 }
 

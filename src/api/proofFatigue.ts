@@ -1,4 +1,5 @@
 import { VerificationRequestV0 } from "../types/api";
+import { hasStrongRecentReAuth } from "./reAuth";
 
 const highRiskWindowHits = new Map<string, number[]>();
 
@@ -38,14 +39,15 @@ function isHighRiskRequest(request: VerificationRequestV0, cfg: ProofFatigueConf
 
 export function checkProofFatigue(request: VerificationRequestV0, cfg: ProofFatigueConfig): {
   allowed: boolean;
-  reason?: "DENY_REAUTH_REQUIRED";
+  reason?: "DENY_REAUTH_REQUIRED" | "DENY_REAUTH_PROOF_INVALID";
 } {
   if (!isHighRiskRequest(request, cfg)) {
     return { allowed: true };
   }
 
-  // if caller indicates recent re-auth, let it pass and record event baseline
-  if (request.meta?.reAuthRecent === true) {
+  // if caller indicates recent re-auth, validate evidence according to runtime mode
+  const reAuth = hasStrongRecentReAuth(request.meta);
+  if (reAuth.ok) {
     recordHighRiskPrompt(request.rp.id, cfg.windowSeconds);
     return { allowed: true };
   }
@@ -57,7 +59,7 @@ export function checkProofFatigue(request: VerificationRequestV0, cfg: ProofFati
 
   if (kept.length >= cfg.maxHighRiskPromptsPerRequester) {
     highRiskWindowHits.set(request.rp.id, kept);
-    return { allowed: false, reason: "DENY_REAUTH_REQUIRED" };
+    return { allowed: false, reason: reAuth.invalidEvidence ? "DENY_REAUTH_PROOF_INVALID" : "DENY_REAUTH_REQUIRED" };
   }
 
   kept.push(now);

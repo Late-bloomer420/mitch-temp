@@ -40,6 +40,7 @@ Each deny result must provide:
 ## Abuse / Platform
 - `DENY_RATE_LIMIT_EXCEEDED` - requester over quota
 - `DENY_REAUTH_REQUIRED` - high-risk prompt frequency threshold reached; recent re-auth required
+- `DENY_REAUTH_PROOF_INVALID` - re-auth evidence provided but invalid under configured strong re-auth mode
 - `DENY_JURISDICTION_INCOMPATIBLE` - requester/runtime jurisdiction mismatch or missing jurisdiction when strict matching is enabled
 - `DENY_CREDENTIAL_REVOKED` - credential identifier is listed as revoked by configured status source
 - `DENY_STATUS_SOURCE_UNAVAILABLE` - key/credential status source unavailable or timed out

@@ -164,7 +164,29 @@ async function run(): Promise<void> {
   const reauth = await verifyRequest(reauthReq, policy, "rp.example", resolveKey);
   assert.equal(reauth.decision, "ALLOW");
 
-  // 10) rate limit burst
+  // 10) strict re-auth evidence mode (webauthn scaffold)
+  process.env.REQUIRE_STRONG_REAUTH = "1";
+  process.env.WEBAUTHN_ASSERTION_ALLOWLIST = "assert-ok-1";
+  resetProofFatigue();
+  resetRateLimiter();
+
+  await verifyRequest(buildRequest(), policy, "rp.example", resolveKey);
+  await verifyRequest(buildRequest(), policy, "rp.example", resolveKey);
+
+  const weakReauthReq = buildRequest();
+  weakReauthReq.meta = { reAuthRecent: true };
+  const weakReauthRes = await verifyRequest(weakReauthReq, policy, "rp.example", resolveKey);
+  assert.equal(weakReauthRes.decisionCode, "DENY_REAUTH_PROOF_INVALID");
+
+  const strongReauthReq = buildRequest();
+  strongReauthReq.meta = { reAuthMethod: "webauthn", reAuthAssertion: "assert-ok-1" };
+  const strongReauthRes = await verifyRequest(strongReauthReq, policy, "rp.example", resolveKey);
+  assert.equal(strongReauthRes.decision, "ALLOW");
+
+  delete process.env.REQUIRE_STRONG_REAUTH;
+  delete process.env.WEBAUTHN_ASSERTION_ALLOWLIST;
+
+  // 11) rate limit burst
   resetRateLimiter();
   let rateLimited = false;
   for (let i = 0; i < 20; i++) {

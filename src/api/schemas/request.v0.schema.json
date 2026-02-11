@@ -58,7 +58,9 @@
       "properties": {
         "channel": { "type": "string" },
         "traceLevel": { "enum": ["minimal", "debug"] },
-        "reAuthRecent": { "type": "boolean" }
+        "reAuthRecent": { "type": "boolean" },
+        "reAuthMethod": { "enum": ["webauthn", "other"] },
+        "reAuthAssertion": { "type": "string", "minLength": 1 }
       },
       "additionalProperties": false
     }
