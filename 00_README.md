@@ -72,6 +72,8 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `46_Security_Attack_Testing.md` — pilot-scope adversarial testing incl. swarm simulation
 - `47_Risk_Register_Extended_Human_and_Governance.md` — socio-technical and governance risk register
 - `48_Mitigations_ProofFatigue_PolicyTamper_Recovery_GDPR.md` — concrete mitigation plan for key non-technical risks
+- `49_Agentic_Threat_Model_and_Controls.md` — threat model for AI-agent misuse and automated abuse
+- `50_AI_Agent_Governance_Policy.md` — policy baseline for safe AI-assisted development
 - `src/api/metrics.ts` — in-service counters for basic KPI telemetry (`GET /metrics`)
 - `src/api/eventLog.ts` + `src/api/kpi.ts` — structured audit events and derived KPI snapshot (`GET /kpi`)
 - `src/api/auditVerify.ts` — audit hash-chain integrity verification (`GET /audit/verify`)
