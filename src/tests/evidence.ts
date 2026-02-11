@@ -79,6 +79,20 @@ export async function runEvidenceScenarios(): Promise<{ generatedAt: string; res
   results.push({ scenario: "deny_revoked_key", code: revoked.decisionCode });
   assert.equal(revoked.decisionCode, "DENY_CRYPTO_KEY_STATUS_INVALID");
 
+  // 5) DENY missing key
+  const missingResolver: ResolveKey = async () => ({ status: "missing" });
+  const missingReq = buildRequest();
+  const missing = await verifyRequest(missingReq, policy, "rp.example", missingResolver);
+  results.push({ scenario: "deny_missing_key", code: missing.decisionCode });
+  assert.equal(missing.decisionCode, "DENY_CRYPTO_KEY_STATUS_INVALID");
+
+  // 6) DENY unsupported alg
+  const algReq = buildRequest();
+  algReq.proofBundle.alg = "RS256";
+  const wrongAlg = await verifyRequest(algReq, policy, "rp.example", activeResolver);
+  results.push({ scenario: "deny_unsupported_alg", code: wrongAlg.decisionCode });
+  assert.equal(wrongAlg.decisionCode, "DENY_CRYPTO_UNSUPPORTED_ALG");
+
   return { generatedAt: new Date().toISOString(), results };
 }
 

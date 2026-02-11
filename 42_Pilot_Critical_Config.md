@@ -30,6 +30,10 @@ Clients must send:
 Optional revoked list:
 - `REVOKED_KEY_IDS=kid-2,kid-3`
 
+Operational behavior notes:
+- missing/revoked/status-unavailable keys are deny-biased for high-risk purposes.
+- keep key source timeout low (e.g., `KEY_SOURCE_TIMEOUT_MS=1500`) to avoid hanging verifier paths.
+
 ## Safety defaults
 - `NODE_ENV=production` to disable dashboard/test endpoints
 - `ALLOW_METRICS=1` only if metrics endpoint is explicitly desired
