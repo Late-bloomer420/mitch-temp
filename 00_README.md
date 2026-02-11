@@ -47,4 +47,6 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `26_Repository_Hygiene_Plan.md` — cleanup plan for dependency/build artifacts
 - `27_ADR_Closure_Record.md` — accepted MVP architecture decisions (binding)
 - `28_Test_Vector_Pack_v0.md` — canonicalization/binding normative vectors
+- `29_Implementation_Scaffold.md` — target module/file structure for coding phase
+- `30_First_Code_Tasks.md` — immediate implementation backlog (top 10)
 - `WHAT_MITCH_IS_NOT.md` — guardrails / positioning
