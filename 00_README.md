@@ -56,4 +56,5 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `35_Product_Architecture_Layers.md` — scope-safe layering (Core/Shield/Orchestrator)
 - `36_Phase2_Shield_and_AI_Orchestration_Roadmap.md` — future expansion roadmap after Core MVP
 - `37_Privacy_Policy_Language_for_Web_and_AI.md` — shared policy grammar concept for web+AI controls
+- `38_KPI_Framework_Core_and_Business.md` — security + business KPI baseline and targets
 - `WHAT_MITCH_IS_NOT.md` — guardrails / positioning
