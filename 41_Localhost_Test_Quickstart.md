@@ -20,6 +20,7 @@ Open in browser:
 - `http://localhost:8080/dashboard` (simple local dashboard)
 - `http://localhost:8080/health`
 - `http://localhost:8080/metrics`
+- `http://localhost:8080/kpi` (derived KPI snapshot)
 
 ## Health check
 ```powershell

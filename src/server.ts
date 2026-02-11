@@ -6,6 +6,8 @@ import { createSignedLocalRequest, localResolveKey } from "./api/testRequestFact
 import { getMetricsSnapshot, recordDecision, resetMetrics } from "./api/metrics";
 import { isAuthorized } from "./config/auth";
 import { envResolveKey } from "./proof/envKeyResolver";
+import { appendEvent } from "./api/eventLog";
+import { getKpiSnapshot } from "./api/kpi";
 
 const PORT = Number(process.env.PORT ?? 8080);
 const RUNTIME_AUDIENCE = process.env.RUNTIME_AUDIENCE ?? "rp.example";
@@ -129,6 +131,11 @@ const server = createServer(async (req, res) => {
     return sendJson(res, 200, getMetricsSnapshot(), correlationId);
   }
 
+  if (req.method === "GET" && req.url === "/kpi") {
+    if (!ALLOW_METRICS) return sendJson(res, 404, { error: "not_found" }, correlationId);
+    return sendJson(res, 200, getKpiSnapshot(), correlationId);
+  }
+
   if (req.method === "GET" && req.url === "/metrics/reset") {
     if (!ALLOW_DEV_RESET) return sendJson(res, 403, { error: "dev_reset_disabled" }, correlationId);
     const reset = resetMetrics();
@@ -158,7 +165,14 @@ const server = createServer(async (req, res) => {
   }
 
   if (req.method === "POST" && req.url === "/verify") {
+    const started = Date.now();
+
     if (!isAuthorized(req.headers.authorization?.toString())) {
+      appendEvent({
+        at: new Date().toISOString(),
+        eventType: "request_rejected_auth",
+        correlationId,
+      });
       return sendJson(res, 401, { error: "unauthorized" }, correlationId);
     }
 
@@ -166,8 +180,25 @@ const server = createServer(async (req, res) => {
       const raw = await readBody(req);
       const parsed: unknown = raw ? JSON.parse(raw) : {};
 
+      appendEvent({
+        at: new Date().toISOString(),
+        eventType: "request_received",
+        correlationId,
+        requestId: typeof parsed === "object" && parsed && "requestId" in parsed ? String((parsed as { requestId?: string }).requestId ?? "unknown") : "unknown",
+        rpId: typeof parsed === "object" && parsed && "rp" in parsed ? String(((parsed as { rp?: { id?: string } }).rp?.id ?? "unknown")) : "unknown",
+      });
+
       const result = await verifyRequest(parsed, defaultPolicy, RUNTIME_AUDIENCE, resolveKey);
       recordDecision(result.decision, result.decisionCode, result.requestId);
+      appendEvent({
+        at: new Date().toISOString(),
+        eventType: "decision_made",
+        correlationId,
+        requestId: result.requestId,
+        decision: result.decision,
+        decisionCode: result.decisionCode,
+        latencyMs: Date.now() - started,
+      });
       const status = result.decision === "ALLOW" ? 200 : 403;
       return sendJson(res, status, result, correlationId);
     } catch (err) {
@@ -176,6 +207,15 @@ const server = createServer(async (req, res) => {
         ? "DENY_SCHEMA_TYPE_MISMATCH"
         : "DENY_INTERNAL_SAFE_FAILURE";
       const status = msg.includes("payload_too_large") ? 413 : 400;
+
+      appendEvent({
+        at: new Date().toISOString(),
+        eventType: "request_rejected_schema",
+        correlationId,
+        decision: "DENY",
+        decisionCode: code,
+        latencyMs: Date.now() - started,
+      });
 
       return sendJson(res, status, {
         version: "v0",
