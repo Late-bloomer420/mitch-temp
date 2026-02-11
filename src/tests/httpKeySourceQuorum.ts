@@ -1,6 +1,6 @@
 import assert from "assert";
 import { createServer, Server } from "http";
-import { HttpKeySource } from "../proof/httpKeySource";
+import { HttpKeySource, getResolverTelemetry } from "../proof/httpKeySource";
 
 function startServer(port: number, payload: Record<string, string>): Promise<Server> {
   const srv = createServer((_, res) => {
@@ -36,6 +36,11 @@ async function run(): Promise<void> {
     );
     const pemStrict = await strict.getPublicKeyPem("kid-1");
     assert.equal(pemStrict, null, "Expected null when quorum cannot be met");
+
+    const telemetry = getResolverTelemetry();
+    assert.ok(telemetry.resolver_queries_total >= 2, "Expected resolver query telemetry increments");
+    assert.ok(telemetry.resolver_inconsistent_responses_total >= 1, "Expected inconsistency telemetry increment");
+    assert.ok(telemetry.resolver_quorum_failures_total >= 1, "Expected quorum failure telemetry increment");
 
     console.log("http key source quorum tests passed");
   } finally {

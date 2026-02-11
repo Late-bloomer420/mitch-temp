@@ -110,6 +110,7 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `82_DID_Resolver_Hardening_v1_Scaffold.md` - small-batch plan for resolver quorum and consistency hardening
 - `83_DID_Resolver_Config_Profile_v1.md` - env profile draft for resolver quorum/timeout hardening
 - `84_DID_Resolver_Quorum_Logic_v1.md` - implemented multi-source key resolver quorum behavior
+- `85_Resolver_Inconsistency_Observability_v1.md` - resolver telemetry surfaced via KPI/dashboard
 - `src/tools/kpiCheckCli.ts` - CLI check for KPI thresholds (`npm run kpi:check`)
 - `src/api/metrics.ts` - in-service counters for basic KPI telemetry (`GET /metrics`)
 - `src/api/eventLog.ts` + `src/api/kpi.ts` - structured audit events and derived KPI snapshot (`GET /kpi`)

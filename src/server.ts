@@ -128,6 +128,9 @@ const server = createServer(async (req, res) => {
 <li><b>deny_status_source_unavailable_rate:</b> ${k.deny_status_source_unavailable_rate ?? 0}</li>
 <li><b>revoked_cache_hit_total:</b> ${k.revoked_cache_hit_total ?? 0}</li>
 <li><b>revoked_cache_store_total:</b> ${k.revoked_cache_store_total ?? 0}</li>
+<li><b>resolver_queries_total:</b> ${k.resolver_queries_total ?? 0}</li>
+<li><b>resolver_quorum_failures_total:</b> ${k.resolver_quorum_failures_total ?? 0}</li>
+<li><b>resolver_inconsistent_responses_total:</b> ${k.resolver_inconsistent_responses_total ?? 0}</li>
 </ul>
 <h3>Recent Decisions (last 10)</h3>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%">

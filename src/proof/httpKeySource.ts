@@ -3,6 +3,12 @@ import { request as httpsRequest } from "https";
 import { URL } from "url";
 import { KeySource } from "./keySource";
 
+const resolverTelemetry = {
+  queriesTotal: 0,
+  quorumFailures: 0,
+  inconsistentResponses: 0,
+};
+
 function fetchJson(urlStr: string, timeoutMs: number): Promise<Record<string, string> | null> {
   return new Promise((resolve) => {
     try {
@@ -45,6 +51,8 @@ export class HttpKeySource implements KeySource {
   ) {}
 
   async getPublicKeyPem(keyId: string): Promise<string | null> {
+    resolverTelemetry.queriesTotal += 1;
+
     const maps = await Promise.all(this.urls.map((u) => fetchJson(u, this.timeoutMs)));
 
     const counts = new Map<string, number>();
@@ -53,6 +61,10 @@ export class HttpKeySource implements KeySource {
       const pem = map[keyId];
       if (typeof pem !== "string" || pem.length === 0) continue;
       counts.set(pem, (counts.get(pem) ?? 0) + 1);
+    }
+
+    if (counts.size > 1) {
+      resolverTelemetry.inconsistentResponses += 1;
     }
 
     let winner: string | null = null;
@@ -64,6 +76,21 @@ export class HttpKeySource implements KeySource {
       }
     }
 
-    return winner && winnerCount >= this.quorum ? winner : null;
+    const ok = winner && winnerCount >= this.quorum;
+    if (!ok) resolverTelemetry.quorumFailures += 1;
+
+    return ok ? winner : null;
   }
+}
+
+export function getResolverTelemetry(): {
+  resolver_queries_total: number;
+  resolver_quorum_failures_total: number;
+  resolver_inconsistent_responses_total: number;
+} {
+  return {
+    resolver_queries_total: resolverTelemetry.queriesTotal,
+    resolver_quorum_failures_total: resolverTelemetry.quorumFailures,
+    resolver_inconsistent_responses_total: resolverTelemetry.inconsistentResponses,
+  };
 }
