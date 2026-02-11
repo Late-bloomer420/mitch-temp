@@ -80,6 +80,25 @@ async function run(): Promise<void> {
   const badSig = await verifyRequest(bad, policy, "rp.example", resolveKey);
   assert.equal(badSig.decisionCode, "DENY_CRYPTO_VERIFY_FAILED");
 
+  // 6) unsupported alg
+  const wrongAlg = buildRequest();
+  wrongAlg.proofBundle.alg = "RS256";
+  const wrongAlgRes = await verifyRequest(wrongAlg, policy, "rp.example", resolveKey);
+  assert.equal(wrongAlgRes.decisionCode, "DENY_CRYPTO_UNSUPPORTED_ALG");
+
+  // 7) revoked key
+  const revokedResolver: ResolveKey = async () => ({ status: "revoked" });
+  const revoked = await verifyRequest(buildRequest(), policy, "rp.example", revokedResolver);
+  assert.equal(revoked.decisionCode, "DENY_CRYPTO_KEY_STATUS_INVALID");
+
+  // 8) unknown schema field
+  const unknownFieldReq = {
+    ...buildRequest(),
+    sneaky: true,
+  } as unknown;
+  const unknownField = await verifyRequest(unknownFieldReq, policy, "rp.example", resolveKey);
+  assert.equal(unknownField.decisionCode, "DENY_SCHEMA_UNKNOWN_FIELD");
+
   console.log("core tests passed");
 }
 

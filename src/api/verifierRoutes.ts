@@ -5,6 +5,7 @@ import { validateBinding } from "../binding/validateBinding";
 import { evaluatePolicy } from "../policy/evaluator";
 import { verifyProofBundle } from "../proof/verifier";
 import { ResolveKey } from "../proof/keyResolver";
+import { validateRequestShape } from "./schemaValidator";
 
 const nonceStore = new InMemoryNonceStore();
 
@@ -25,12 +26,22 @@ function deny(requestId: string, decisionCode: string): VerificationResponseV0 {
  * Gate order: schema -> binding -> policy -> (crypto placeholder) -> receipt
  */
 export async function verifyRequest(
-  request: VerificationRequestV0,
+  requestInput: unknown,
   policy: PolicyManifestV0,
   runtimeAudience: string,
   resolveKey: ResolveKey
 ): Promise<VerificationResponseV0> {
+  const requestId =
+    typeof requestInput === "object" && requestInput && "requestId" in requestInput
+      ? String((requestInput as { requestId?: string }).requestId ?? "unknown")
+      : "unknown";
+
   try {
+    // schema gate
+    const schema = validateRequestShape(requestInput);
+    if (!schema.ok) return deny(requestId, schema.code);
+    const request = schema.value;
+
     // binding gate
     const binding = await validateBinding(request, runtimeAudience, nonceStore, {
       clockSkewSeconds: 90,
@@ -61,6 +72,6 @@ export async function verifyRequest(
       verifiedAt: new Date().toISOString(),
     };
   } catch {
-    return deny(request.requestId, "DENY_INTERNAL_SAFE_FAILURE");
+    return deny(requestId, "DENY_INTERNAL_SAFE_FAILURE");
   }
 }
