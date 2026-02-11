@@ -34,4 +34,6 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `13_MVP_Readiness_Checklist.md` — go/no-go criteria for pilot
 - `14_MVP_Risk_Register.md` — active risk tracking for MVP delivery
 - `15_MVP_Work_Breakdown.md` — epics/tasks/owners/estimates for delivery
+- `16_MVP_Architecture_Decision_Log.md` — ADR index for hard technical choices
+- `17_API_Contract_v0.md` — requester/verifier contract draft for MVP
 - `WHAT_MITCH_IS_NOT.md` — guardrails / positioning
