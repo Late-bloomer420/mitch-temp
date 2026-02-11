@@ -17,6 +17,11 @@ Server runs on `http://localhost:8080`.
 Invoke-WebRequest -UseBasicParsing http://localhost:8080/health | Select-Object -ExpandProperty Content
 ```
 
+## Metrics check
+```powershell
+Invoke-WebRequest -UseBasicParsing http://localhost:8080/metrics | Select-Object -ExpandProperty Content
+```
+
 ## ALLOW path test (signed request)
 1) Generate signed request:
 ```powershell

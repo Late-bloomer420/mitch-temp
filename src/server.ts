@@ -3,6 +3,7 @@ import { verifyRequest } from "./api/verifierRoutes";
 import { PolicyManifestV0 } from "./types/policy";
 import { ResolveKey } from "./proof/keyResolver";
 import { createSignedLocalRequest, localResolveKey } from "./api/testRequestFactory";
+import { getMetricsSnapshot, recordDecision } from "./api/metrics";
 
 const PORT = Number(process.env.PORT ?? 8080);
 const RUNTIME_AUDIENCE = process.env.RUNTIME_AUDIENCE ?? "rp.example";
@@ -50,6 +51,10 @@ const server = createServer(async (req, res) => {
     return sendJson(res, 200, { status: "ok" }, correlationId);
   }
 
+  if (req.method === "GET" && req.url === "/metrics") {
+    return sendJson(res, 200, getMetricsSnapshot(), correlationId);
+  }
+
   if (req.method === "GET" && req.url === "/test-request") {
     if (process.env.LOCAL_TEST_KEYS !== "1") {
       return sendJson(res, 403, { error: "test_keys_disabled" }, correlationId);
@@ -64,6 +69,7 @@ const server = createServer(async (req, res) => {
       const parsed: unknown = raw ? JSON.parse(raw) : {};
 
       const result = await verifyRequest(parsed, defaultPolicy, RUNTIME_AUDIENCE, resolveKey);
+      recordDecision(result.decision, result.decisionCode);
       const status = result.decision === "ALLOW" ? 200 : 403;
       return sendJson(res, status, result, correlationId);
     } catch {
