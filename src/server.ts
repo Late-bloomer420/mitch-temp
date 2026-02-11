@@ -7,7 +7,11 @@ import { getMetricsSnapshot, recordDecision, resetMetrics } from "./api/metrics"
 
 const PORT = Number(process.env.PORT ?? 8080);
 const RUNTIME_AUDIENCE = process.env.RUNTIME_AUDIENCE ?? "rp.example";
-const ALLOW_DEV_RESET = process.env.ALLOW_DEV_RESET === "1";
+const IS_PROD = process.env.NODE_ENV === "production";
+const ALLOW_DEV_RESET = !IS_PROD && process.env.ALLOW_DEV_RESET === "1";
+const ALLOW_TEST_KEYS = !IS_PROD && process.env.LOCAL_TEST_KEYS === "1";
+const ALLOW_METRICS = !IS_PROD || process.env.ALLOW_METRICS === "1";
+const MAX_BODY_BYTES = Number(process.env.MAX_BODY_BYTES ?? 262144);
 
 const defaultPolicy: PolicyManifestV0 = {
   version: "v0",
@@ -18,7 +22,7 @@ const defaultPolicy: PolicyManifestV0 = {
 };
 
 // TODO: replace with real key resolver + issuer status integration
-const resolveKey: ResolveKey = process.env.LOCAL_TEST_KEYS === "1"
+const resolveKey: ResolveKey = ALLOW_TEST_KEYS
   ? localResolveKey
   : async () => ({ status: "missing" });
 
@@ -53,7 +57,16 @@ function sendHtml(res: ServerResponse, statusCode: number, html: string, correla
 function readBody(req: IncomingMessage): Promise<string> {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
-    req.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
+    let total = 0;
+    req.on("data", (chunk) => {
+      const buf = Buffer.from(chunk);
+      total += buf.length;
+      if (total > MAX_BODY_BYTES) {
+        req.destroy(new Error("payload_too_large"));
+        return;
+      }
+      chunks.push(buf);
+    });
     req.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
     req.on("error", reject);
   });
@@ -83,6 +96,7 @@ const server = createServer(async (req, res) => {
   }
 
   if (req.method === "GET" && req.url === "/dashboard") {
+    if (IS_PROD) return sendJson(res, 404, { error: "not_found" }, correlationId);
     const m = getMetricsSnapshot();
     const recentRows = m.recentDecisions
       .map(
@@ -111,6 +125,7 @@ const server = createServer(async (req, res) => {
   }
 
   if (req.method === "GET" && req.url === "/metrics") {
+    if (!ALLOW_METRICS) return sendJson(res, 404, { error: "not_found" }, correlationId);
     return sendJson(res, 200, getMetricsSnapshot(), correlationId);
   }
 
@@ -121,6 +136,7 @@ const server = createServer(async (req, res) => {
   }
 
   if (req.method === "GET" && req.url === "/metrics.csv") {
+    if (!ALLOW_METRICS) return sendJson(res, 404, { error: "not_found" }, correlationId);
     const m = getMetricsSnapshot();
     const rows = [
       "metric,value",
@@ -134,7 +150,7 @@ const server = createServer(async (req, res) => {
   }
 
   if (req.method === "GET" && req.url === "/test-request") {
-    if (process.env.LOCAL_TEST_KEYS !== "1") {
+    if (!ALLOW_TEST_KEYS) {
       return sendJson(res, 403, { error: "test_keys_disabled" }, correlationId);
     }
     const sample = createSignedLocalRequest(RUNTIME_AUDIENCE);
@@ -150,12 +166,18 @@ const server = createServer(async (req, res) => {
       recordDecision(result.decision, result.decisionCode, result.requestId);
       const status = result.decision === "ALLOW" ? 200 : 403;
       return sendJson(res, status, result, correlationId);
-    } catch {
-      return sendJson(res, 400, {
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "";
+      const code = msg.includes("payload_too_large")
+        ? "DENY_SCHEMA_TYPE_MISMATCH"
+        : "DENY_INTERNAL_SAFE_FAILURE";
+      const status = msg.includes("payload_too_large") ? 413 : 400;
+
+      return sendJson(res, status, {
         version: "v0",
         requestId: "unknown",
         decision: "DENY",
-        decisionCode: "DENY_INTERNAL_SAFE_FAILURE",
+        decisionCode: code,
         claimsSatisfied: [],
         receiptRef: "aqdr:pending",
         verifiedAt: new Date().toISOString(),
