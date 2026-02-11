@@ -70,6 +70,14 @@ export function getKpiSnapshot(): Record<string, number> {
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean).length;
+
+  const reauthStrongEnabled = process.env.REQUIRE_STRONG_REAUTH === "1" ? 1 : 0;
+  const webauthnMode = (process.env.WEBAUTHN_VERIFY_MODE ?? "allowlist").toLowerCase();
+  const webauthnModeCode = webauthnMode === "native" ? 2 : webauthnMode === "signed" ? 1 : 0;
+  const hasSignedSecret = (process.env.WEBAUTHN_ASSERTION_HMAC_SECRET ?? "").length > 0;
+  const hasNativeSecret = (process.env.WEBAUTHN_NATIVE_ADAPTER_SECRET ?? "").length > 0;
+  const webauthnSecretConfigValid =
+    webauthnMode === "signed" ? (hasSignedSecret ? 1 : 0) : webauthnMode === "native" ? (hasNativeSecret ? 1 : 0) : 1;
   const estimatedFixedMonthlyCost = Number(process.env.ESTIMATED_FIXED_MONTHLY_COST_EUR ?? 0);
   const estimatedMonthlyVerificationVolume = Number(process.env.ESTIMATED_MONTHLY_VERIFICATION_VOLUME ?? total);
   const estimatedMonthlyRunCost =
@@ -97,6 +105,9 @@ export function getKpiSnapshot(): Record<string, number> {
     resolver_inconsistent_responses_total: resolver.resolver_inconsistent_responses_total,
     estimated_cost_per_verification_eur: estimatedCostPerVerification,
     crypto_allowed_algs_count: allowedAlgsCount,
+    reauth_strong_enabled: reauthStrongEnabled,
+    webauthn_verify_mode_code: webauthnModeCode,
+    webauthn_secret_config_valid: webauthnSecretConfigValid,
     estimated_monthly_verification_volume: Math.max(0, estimatedMonthlyVerificationVolume),
     estimated_fixed_monthly_cost_eur: estimatedFixedMonthlyCost,
     estimated_monthly_run_cost_eur: estimatedMonthlyRunCost,

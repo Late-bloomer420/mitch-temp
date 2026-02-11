@@ -15,6 +15,16 @@ Define simple, actionable alert thresholds for pilot operations.
   2. Notify pilot stakeholders and freeze risky rollout paths
   3. Add regression test before resuming normal operations
 
+### 0b) WebAuthn strong-mode config invalid
+- Signals:
+  - `reauth_strong_enabled = 1`
+  - `webauthn_verify_mode_code > 0`
+  - `webauthn_secret_config_valid = 0`
+- Critical: any occurrence
+- Action:
+  1. Fix missing/invalid WebAuthn secret config immediately
+  2. Re-run `kpi:check` and verify critical clears
+
 ### 1) Status source degradation
 - Signal: `deny_status_source_unavailable_rate`
 - Warning: `> 0.05` over last review window

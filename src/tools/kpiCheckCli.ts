@@ -39,6 +39,12 @@ function run(): void {
   const denyResolverQuorumFailed = Number(kpi.deny_resolver_quorum_failed_total ?? 0);
   const resolverQuorumFailures = Number(kpi.resolver_quorum_failures_total ?? 0);
   const resolverInconsistent = Number(kpi.resolver_inconsistent_responses_total ?? 0);
+  const estimatedCostPerVerification = Number(kpi.estimated_cost_per_verification_eur ?? 0);
+  const cryptoAllowedAlgsCount = Number(kpi.crypto_allowed_algs_count ?? 0);
+  const estimatedMonthlyRunCost = Number(kpi.estimated_monthly_run_cost_eur ?? 0);
+  const reauthStrongEnabled = Number(kpi.reauth_strong_enabled ?? 0);
+  const webauthnModeCode = Number(kpi.webauthn_verify_mode_code ?? 0);
+  const webauthnSecretConfigValid = Number(kpi.webauthn_secret_config_valid ?? 1);
 
   const issues: string[] = [];
 
@@ -54,6 +60,10 @@ function run(): void {
 
   if (falseAllowTotal > 0) {
     issues.push(`CRITICAL: false_allow_total=${falseAllowTotal} > 0`);
+  }
+
+  if (reauthStrongEnabled === 1 && webauthnModeCode > 0 && webauthnSecretConfigValid === 0) {
+    issues.push("CRITICAL: strong re-auth enabled but WebAuthn secret config is invalid");
   }
 
   if (resolverInconsistent > t.critResolverInconsistentTotal) {
@@ -86,10 +96,6 @@ function run(): void {
     );
   }
 
-  const estimatedCostPerVerification = Number(kpi.estimated_cost_per_verification_eur ?? 0);
-  const cryptoAllowedAlgsCount = Number(kpi.crypto_allowed_algs_count ?? 0);
-  const estimatedMonthlyRunCost = Number(kpi.estimated_monthly_run_cost_eur ?? 0);
-
   const output = {
     checkedAt: new Date().toISOString(),
     thresholds: t,
@@ -105,6 +111,9 @@ function run(): void {
       resolver_inconsistent_responses_total: resolverInconsistent,
       estimated_cost_per_verification_eur: estimatedCostPerVerification,
       crypto_allowed_algs_count: cryptoAllowedAlgsCount,
+      reauth_strong_enabled: reauthStrongEnabled,
+      webauthn_verify_mode_code: webauthnModeCode,
+      webauthn_secret_config_valid: webauthnSecretConfigValid,
       estimated_monthly_run_cost_eur: estimatedMonthlyRunCost,
     },
     issues,
