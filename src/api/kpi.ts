@@ -7,6 +7,7 @@ interface ParsedEvent {
   decision?: "ALLOW" | "DENY";
   decisionCode?: string;
   latencyMs?: number;
+  details?: Record<string, string | number | boolean>;
 }
 
 function readEvents(): ParsedEvent[] {
@@ -39,8 +40,12 @@ export function getKpiSnapshot(): Record<string, number> {
   const denies = decisions.filter((e) => e.decision === "DENY").length;
   const total = decisions.length;
 
-  const falseDenyProxy = decisions.filter((e) => e.decisionCode === "DENY_INTERNAL_SAFE_FAILURE").length;
-  const overrideProxy = 0; // placeholder until explicit override events exist
+  const adjudications = events.filter((e) => e.eventType === "adjudication_recorded");
+  const falseDenies = adjudications.filter((e) => e.details?.outcome === "false_deny").length;
+  const legitAdjudications = adjudications.filter((e) => e.details?.outcome === "legit" || e.details?.outcome === "false_deny").length;
+
+  const overrides = events.filter((e) => e.eventType === "decision_override").length;
+
   const replayDenies = decisions.filter((e) => e.decisionCode === "DENY_BINDING_NONCE_REPLAY").length;
   const replayAttempts = replayDenies;
 
@@ -54,8 +59,8 @@ export function getKpiSnapshot(): Record<string, number> {
     deny_total: denies,
     verification_success_rate: total > 0 ? allows / total : 0,
     replay_block_rate: replayAttempts > 0 ? replayDenies / replayAttempts : 1,
-    false_deny_proxy_rate: total > 0 ? falseDenyProxy / total : 0,
-    policy_override_rate: overrideProxy,
+    false_deny_rate: legitAdjudications > 0 ? falseDenies / legitAdjudications : 0,
+    policy_override_rate: total > 0 ? overrides / total : 0,
     latency_p50_ms: percentile(latencies, 50),
     latency_p95_ms: percentile(latencies, 95),
   };

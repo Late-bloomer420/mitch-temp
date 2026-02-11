@@ -22,6 +22,10 @@ Open in browser:
 - `http://localhost:8080/metrics`
 - `http://localhost:8080/kpi` (derived KPI snapshot)
 
+Authenticated ops endpoints:
+- `POST /override`
+- `POST /adjudicate`
+
 ## Health check
 ```powershell
 Invoke-WebRequest -UseBasicParsing http://localhost:8080/health | Select-Object -ExpandProperty Content

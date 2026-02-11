@@ -8,6 +8,7 @@ import { isAuthorized } from "./config/auth";
 import { envResolveKey } from "./proof/envKeyResolver";
 import { appendEvent } from "./api/eventLog";
 import { getKpiSnapshot } from "./api/kpi";
+import { recordAdjudication, recordOverride } from "./api/operations";
 
 const PORT = Number(process.env.PORT ?? 8080);
 const RUNTIME_AUDIENCE = process.env.RUNTIME_AUDIENCE ?? "rp.example";
@@ -87,7 +88,7 @@ const server = createServer(async (req, res) => {
       200,
       {
         service: "miTch verifier",
-        endpoints: ["GET /", "GET /health", "GET /dashboard", "GET /metrics", "GET /metrics.csv", "GET /metrics/reset (ALLOW_DEV_RESET=1)", "GET /test-request (LOCAL_TEST_KEYS=1)", "POST /verify"],
+        endpoints: ["GET /", "GET /health", "GET /dashboard", "GET /metrics", "GET /metrics.csv", "GET /kpi", "GET /metrics/reset (ALLOW_DEV_RESET=1)", "GET /test-request (LOCAL_TEST_KEYS=1)", "POST /verify", "POST /override", "POST /adjudicate"],
       },
       correlationId
     );
@@ -162,6 +163,50 @@ const server = createServer(async (req, res) => {
     }
     const sample = createSignedLocalRequest(RUNTIME_AUDIENCE);
     return sendJson(res, 200, sample, correlationId);
+  }
+
+  if (req.method === "POST" && req.url === "/override") {
+    if (!isAuthorized(req.headers.authorization?.toString())) {
+      return sendJson(res, 401, { error: "unauthorized" }, correlationId);
+    }
+    try {
+      const body = JSON.parse(await readBody(req)) as {
+        requestId?: string;
+        previousDecisionCode?: string;
+        newDecision?: "ALLOW" | "DENY";
+        reason?: string;
+      };
+      if (!body.requestId || !body.previousDecisionCode || !body.newDecision || !body.reason) {
+        return sendJson(res, 400, { error: "bad_request" }, correlationId);
+      }
+      recordOverride({
+        correlationId,
+        requestId: body.requestId,
+        previousDecisionCode: body.previousDecisionCode,
+        newDecision: body.newDecision,
+        reason: body.reason,
+      });
+      return sendJson(res, 200, { status: "ok" }, correlationId);
+    } catch {
+      return sendJson(res, 400, { error: "bad_request" }, correlationId);
+    }
+  }
+
+  if (req.method === "POST" && req.url === "/adjudicate") {
+    if (!isAuthorized(req.headers.authorization?.toString())) {
+      return sendJson(res, 401, { error: "unauthorized" }, correlationId);
+    }
+    try {
+      const body = JSON.parse(await readBody(req)) as {
+        requestId?: string;
+        outcome?: "legit" | "false_deny" | "false_allow";
+      };
+      if (!body.requestId || !body.outcome) return sendJson(res, 400, { error: "bad_request" }, correlationId);
+      recordAdjudication({ correlationId, requestId: body.requestId, outcome: body.outcome });
+      return sendJson(res, 200, { status: "ok" }, correlationId);
+    } catch {
+      return sendJson(res, 400, { error: "bad_request" }, correlationId);
+    }
   }
 
   if (req.method === "POST" && req.url === "/verify") {
