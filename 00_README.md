@@ -59,6 +59,7 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `38_KPI_Framework_Core_and_Business.md` — security + business KPI baseline and targets
 - `39_Pilot_KPI_Dashboard_Template.md` — weekly KPI reporting template for pilot operations
 - `40_KPI_Definitions_and_Data_Sources.md` — formulas, telemetry sources, and KPI ownership
+- `41_Localhost_Test_Quickstart.md` — run/test instructions for local verifier service
 - `LICENSE` — MIT open-source license
 - `NOTICE` — ownership and positioning notice
 - `CODEOWNERS` — default review ownership
