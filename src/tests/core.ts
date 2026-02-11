@@ -303,6 +303,8 @@ async function run(): Promise<void> {
   // 13) strict re-auth evidence mode (webauthn scaffold)
   process.env.REQUIRE_STRONG_REAUTH = "1";
   process.env.WEBAUTHN_ASSERTION_ALLOWLIST = "assert-ok-1";
+  process.env.WEBAUTHN_CHALLENGE_ALLOWLIST = "challenge-ok-1";
+  process.env.WEBAUTHN_MAX_AGE_SECONDS = "120";
   resetProofFatigue();
   resetRateLimiter();
 
@@ -314,13 +316,30 @@ async function run(): Promise<void> {
   const weakReauthRes = await verifyRequest(weakReauthReq, policy, "rp.example", resolveKey);
   assert.equal(weakReauthRes.decisionCode, "DENY_REAUTH_PROOF_INVALID");
 
+  const staleReauthReq = buildRequest();
+  staleReauthReq.meta = {
+    reAuthMethod: "webauthn",
+    reAuthAssertion: "assert-ok-1",
+    reAuthChallenge: "challenge-ok-1",
+    reAuthIssuedAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+  };
+  const staleReauthRes = await verifyRequest(staleReauthReq, policy, "rp.example", resolveKey);
+  assert.equal(staleReauthRes.decisionCode, "DENY_REAUTH_PROOF_INVALID");
+
   const strongReauthReq = buildRequest();
-  strongReauthReq.meta = { reAuthMethod: "webauthn", reAuthAssertion: "assert-ok-1" };
+  strongReauthReq.meta = {
+    reAuthMethod: "webauthn",
+    reAuthAssertion: "assert-ok-1",
+    reAuthChallenge: "challenge-ok-1",
+    reAuthIssuedAt: new Date().toISOString(),
+  };
   const strongReauthRes = await verifyRequest(strongReauthReq, policy, "rp.example", resolveKey);
   assert.equal(strongReauthRes.decision, "ALLOW");
 
   delete process.env.REQUIRE_STRONG_REAUTH;
   delete process.env.WEBAUTHN_ASSERTION_ALLOWLIST;
+  delete process.env.WEBAUTHN_CHALLENGE_ALLOWLIST;
+  delete process.env.WEBAUTHN_MAX_AGE_SECONDS;
 
   // 14) rate limit burst
   resetRateLimiter();

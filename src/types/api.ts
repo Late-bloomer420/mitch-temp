@@ -27,6 +27,8 @@ export interface VerificationRequestV0 {
     reAuthRecent?: boolean;
     reAuthMethod?: "webauthn" | "other";
     reAuthAssertion?: string;
+    reAuthChallenge?: string;
+    reAuthIssuedAt?: string;
   };
 }
 

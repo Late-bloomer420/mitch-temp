@@ -54,7 +54,13 @@ Operational behavior notes:
 Optional strong re-auth scaffold (WebAuthn integration hook):
 - `REQUIRE_STRONG_REAUTH=1`
 - `WEBAUTHN_ASSERTION_ALLOWLIST=assertion-token-1,assertion-token-2`
-- request metadata should include `meta.reAuthMethod=webauthn` + `meta.reAuthAssertion`
+- `WEBAUTHN_CHALLENGE_ALLOWLIST=challenge-1,challenge-2`
+- `WEBAUTHN_MAX_AGE_SECONDS=120`
+- request metadata should include:
+  - `meta.reAuthMethod=webauthn`
+  - `meta.reAuthAssertion`
+  - `meta.reAuthChallenge`
+  - `meta.reAuthIssuedAt` (ISO date-time)
 
 ## Jurisdiction compatibility (optional strict mode)
 - `REQUIRE_JURISDICTION_MATCH=1`

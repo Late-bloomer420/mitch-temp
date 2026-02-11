@@ -70,7 +70,9 @@
         "traceLevel": { "enum": ["minimal", "debug"] },
         "reAuthRecent": { "type": "boolean" },
         "reAuthMethod": { "enum": ["webauthn", "other"] },
-        "reAuthAssertion": { "type": "string", "minLength": 1 }
+        "reAuthAssertion": { "type": "string", "minLength": 1 },
+        "reAuthChallenge": { "type": "string", "minLength": 1 },
+        "reAuthIssuedAt": { "type": "string", "format": "date-time" }
       },
       "additionalProperties": false
     }
