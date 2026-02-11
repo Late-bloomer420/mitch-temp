@@ -1,4 +1,4 @@
-# Mitch
+# miTch
 Privacy-First Personal Data Infrastructure
 CORE PRINCIPLES (DO NOT BREAK)
 • Data stays with the user
