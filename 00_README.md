@@ -87,6 +87,7 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `.github/workflows/ci-security.yml` — merge-gate CI for tests, evidence, swarm test, and dependency audit
 - `61_Jurisdiction_Compatibility_Gate_v1.md` — strict jurisdiction mismatch deny baseline
 - `62_Revocation_Status_Resolver_v2_Scaffold.md` — env/http credential status resolver scaffold and fail-closed mapping
+- `63_Deny_Code_Credential_Revoked.md` — dedicated deny code for credential-level revocation outcomes
 - `src/api/metrics.ts` — in-service counters for basic KPI telemetry (`GET /metrics`)
 - `src/api/eventLog.ts` + `src/api/kpi.ts` — structured audit events and derived KPI snapshot (`GET /kpi`)
 - `src/api/auditVerify.ts` — audit hash-chain integrity verification (`GET /audit/verify`)

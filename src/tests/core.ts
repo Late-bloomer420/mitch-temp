@@ -112,7 +112,7 @@ async function run(): Promise<void> {
   const revokedCredReq = buildRequest();
   revokedCredReq.proofBundle.credentialId = "cred-revoked-1";
   const revokedCred = await verifyRequest(revokedCredReq, policy, "rp.example", resolveKey);
-  assert.equal(revokedCred.decisionCode, "DENY_CRYPTO_KEY_STATUS_INVALID");
+  assert.equal(revokedCred.decisionCode, "DENY_CREDENTIAL_REVOKED");
   delete process.env.REVOKED_CREDENTIAL_IDS;
 
   // 7e) credential status provider unavailable (http mode)
