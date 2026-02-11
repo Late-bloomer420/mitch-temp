@@ -43,4 +43,6 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `22_Pilot_Go_NoGo_Template.md` — formal pilot decision template
 - `23_Implementation_Sequence_v0.md` — concrete build order to MVP
 - `24_Repo_Setup_and_GitHub_Linking.md` — current git/remote status + linking steps
+- `25_Sprint_1_Task_Board.md` — week-1 execution board with acceptance criteria
+- `26_Repository_Hygiene_Plan.md` — cleanup plan for dependency/build artifacts
 - `WHAT_MITCH_IS_NOT.md` — guardrails / positioning
