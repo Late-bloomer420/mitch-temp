@@ -66,7 +66,7 @@ Optional strong re-auth scaffold (WebAuthn integration hook):
 - `WEBAUTHN_MAX_AGE_SECONDS=120`
 - `WEBAUTHN_VERIFY_MODE=allowlist|signed|native` (default: `allowlist`)
 - `WEBAUTHN_ASSERTION_HMAC_SECRET=<secret>` (required for `signed` mode)
-- `WEBAUTHN_NATIVE_ADAPTER_OK=1` (integration test hook only; do not use as production auth mechanism)
+- `WEBAUTHN_NATIVE_ADAPTER_SECRET=<secret>` (required for `native` mode in this scaffold)
 - WebAuthn challenges are treated as one-time-use within the freshness window.
 - request metadata should include:
   - `meta.reAuthMethod=webauthn`

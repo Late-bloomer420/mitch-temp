@@ -121,6 +121,7 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `93_PQ_Readiness_Crypto_Agility_v1.md` - configurable algorithm allowlist baseline for future PQ migration
 - `94_WebAuthn_Crypto_Verification_Scaffold_v3.md` - signed assertion verification scaffold for strong re-auth
 - `95_WebAuthn_Native_Verifier_Hook_v1.md` - verifier interface hook for future native authenticator checks
+- `96_WebAuthn_Native_Hook_Bound_Adapter_Evidence.md` - native hook now requires request-bound cryptographic adapter evidence
 - `src/tools/kpiCheckCli.ts` - CLI check for KPI thresholds (`npm run kpi:check`)
 - `src/api/metrics.ts` - in-service counters for basic KPI telemetry (`GET /metrics`)
 - `src/api/eventLog.ts` + `src/api/kpi.ts` - structured audit events and derived KPI snapshot (`GET /kpi`)

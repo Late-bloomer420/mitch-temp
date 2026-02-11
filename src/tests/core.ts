@@ -14,8 +14,15 @@ function b64u(buffer: Buffer): string {
   return buffer.toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
 }
 
-function signReAuthAssertion(challenge: string, rpId: string, origin: string, issuedAt: string, secret: string): string {
-  const payload = `${challenge}|${rpId}|${origin}|${issuedAt}`;
+function signReAuthAssertion(
+  challenge: string,
+  rpId: string,
+  origin: string,
+  issuedAt: string,
+  secret: string,
+  context = "signed"
+): string {
+  const payload = `${context}|${challenge}|${rpId}|${origin}|${issuedAt}`;
   return b64u(createHmac("sha256", secret).update(payload).digest());
 }
 
@@ -408,10 +415,12 @@ async function run(): Promise<void> {
   const signedReauthRes = await verifyRequest(signedReauthReq, policy, "rp.example", resolveKey);
   assert.equal(signedReauthRes.decision, "ALLOW");
 
-  // 13c) native verifier hook defaults to deny unless trusted adapter signal is present
+  // 13c) native verifier hook defaults to deny unless adapter evidence is cryptographically bound
   resetReAuthState();
   resetRateLimiter();
   process.env.WEBAUTHN_VERIFY_MODE = "native";
+  process.env.WEBAUTHN_NATIVE_ADAPTER_SECRET = "native-secret-1";
+
   const nativeReq = buildRequest();
   nativeReq.meta = {
     reAuthMethod: "webauthn",
@@ -424,19 +433,27 @@ async function run(): Promise<void> {
   const nativeDenied = await verifyRequest(nativeReq, policy, "rp.example", resolveKey);
   assert.equal(nativeDenied.decisionCode, "DENY_REAUTH_PROOF_INVALID");
 
-  process.env.WEBAUTHN_NATIVE_ADAPTER_OK = "1";
+  const nativeIssuedAt = new Date().toISOString();
+  const nativeAssertion = signReAuthAssertion(
+    "challenge-ok-1",
+    "rp.example",
+    "https://rp.example",
+    nativeIssuedAt,
+    "native-secret-1",
+    "native"
+  );
   const nativeAllowedReq = buildRequest();
   nativeAllowedReq.meta = {
     reAuthMethod: "webauthn",
-    reAuthAssertion: "native-opaque-assertion-2",
+    reAuthAssertion: nativeAssertion,
     reAuthChallenge: "challenge-ok-1",
-    reAuthIssuedAt: new Date().toISOString(),
+    reAuthIssuedAt: nativeIssuedAt,
     reAuthRpId: "rp.example",
     reAuthOrigin: "https://rp.example",
   };
   const nativeAllowed = await verifyRequest(nativeAllowedReq, policy, "rp.example", resolveKey);
   assert.equal(nativeAllowed.decision, "ALLOW");
-  delete process.env.WEBAUTHN_NATIVE_ADAPTER_OK;
+  delete process.env.WEBAUTHN_NATIVE_ADAPTER_SECRET;
 
   delete process.env.WEBAUTHN_VERIFY_MODE;
   delete process.env.WEBAUTHN_ASSERTION_HMAC_SECRET;
