@@ -98,6 +98,7 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `71_Revoked_Only_Cache_Safety_Model.md` - conservative local cache model (revoked-only, bounded, short TTL)
 - `72_KPI_Revoked_Cache_Observability.md` - KPI counters for revoked-cache hits/stores
 - `73_Dashboard_Revoked_Cache_KPI.md` - dashboard visibility for revoked-cache counters
+- `74_Security_KPI_Alert_Thresholds_v1.md` - pilot alert thresholds for status outage and revoked-cache dependency
 - `src/api/metrics.ts` - in-service counters for basic KPI telemetry (`GET /metrics`)
 - `src/api/eventLog.ts` + `src/api/kpi.ts` - structured audit events and derived KPI snapshot (`GET /kpi`)
 - `src/api/auditVerify.ts` - audit hash-chain integrity verification (`GET /audit/verify`)

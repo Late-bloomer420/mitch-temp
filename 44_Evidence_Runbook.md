@@ -26,5 +26,15 @@ Creates a timestamped folder under `data/evidence/<timestamp>/`.
 ## Output
 JSON summary printed to console (can be copied into weekly KPI report).
 
+## KPI threshold check (recommended)
+After evidence export, capture current `/kpi` and compare key signals against:
+- `74_Security_KPI_Alert_Thresholds_v1.md`
+
+Minimum check set:
+- `deny_status_source_unavailable_rate`
+- `revoked_cache_hit_total`
+- `revoked_cache_store_total`
+- `deny_credential_revoked_total`
+
 ## Notes
 This runbook validates deterministic control behavior, not business throughput.
