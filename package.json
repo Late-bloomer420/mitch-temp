@@ -5,7 +5,9 @@
   "main": "dist/index.js",
   "scripts": {
     "compile": "tsc",
-    "test": "npm run compile && node dist/tests/core.js"
+    "test": "npm run compile && node dist/tests/core.js",
+    "start": "node dist/server.js",
+    "dev": "npm run compile && node dist/server.js"
   },
   "keywords": [
     "privacy",
