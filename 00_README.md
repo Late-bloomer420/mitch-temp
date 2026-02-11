@@ -58,4 +58,6 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `37_Privacy_Policy_Language_for_Web_and_AI.md` — shared policy grammar concept for web+AI controls
 - `38_KPI_Framework_Core_and_Business.md` — security + business KPI baseline and targets
 - `39_Pilot_KPI_Dashboard_Template.md` — weekly KPI reporting template for pilot operations
+- `40_KPI_Definitions_and_Data_Sources.md` — formulas, telemetry sources, and KPI ownership
+- `LICENSE` — MIT open-source license
 - `WHAT_MITCH_IS_NOT.md` — guardrails / positioning
