@@ -11,7 +11,10 @@ function parseRevokedIds(value?: string): Set<string> {
   );
 }
 
-async function checkHttpStatus(credentialId: string): Promise<CredentialStatusCheck> {
+async function checkHttpStatus(
+  credentialId: string,
+  statusListIndex?: string
+): Promise<CredentialStatusCheck> {
   const url = (process.env.CREDENTIAL_STATUS_URL ?? "").trim();
   if (!url) return { ok: false, reason: "credential_status_unavailable" };
 
@@ -22,11 +25,16 @@ async function checkHttpStatus(credentialId: string): Promise<CredentialStatusCh
   try {
     const res = await fetch(url, { signal: controller.signal });
     if (!res.ok) return { ok: false, reason: "credential_status_unavailable" };
-    const data = (await res.json()) as { revokedCredentialIds?: string[] };
-    const revoked = Array.isArray(data.revokedCredentialIds)
+    const data = (await res.json()) as { revokedCredentialIds?: string[]; revokedIndexes?: Array<string | number> };
+    const revokedIds = Array.isArray(data.revokedCredentialIds)
       ? new Set(data.revokedCredentialIds.map((s) => String(s).trim()).filter(Boolean))
       : new Set<string>();
-    return { ok: true, revoked: revoked.has(credentialId) };
+    const revokedIndexes = Array.isArray(data.revokedIndexes)
+      ? new Set(data.revokedIndexes.map((s) => String(s).trim()).filter(Boolean))
+      : new Set<string>();
+    const isRevokedById = revokedIds.has(credentialId);
+    const isRevokedByIndex = !!statusListIndex && revokedIndexes.has(statusListIndex);
+    return { ok: true, revoked: isRevokedById || isRevokedByIndex };
   } catch {
     return { ok: false, reason: "credential_status_unavailable" };
   } finally {
@@ -54,12 +62,15 @@ export async function checkCredentialRevocation(
   const mode = (process.env.CREDENTIAL_STATUS_MODE ?? "env").trim().toLowerCase();
 
   const effectiveCredentialId = credentialId ?? "";
+  const effectiveStatusIndex = credentialStatus?.statusListIndex?.trim() ?? "";
 
   // baseline env mode
   const envRevoked = parseRevokedIds(process.env.REVOKED_CREDENTIAL_IDS);
+  const envRevokedIndexes = parseRevokedIds(process.env.REVOKED_STATUS_LIST_INDEXES);
   if (mode === "env") {
-    if (!effectiveCredentialId) return { ok: true, revoked: false };
-    return { ok: true, revoked: envRevoked.has(effectiveCredentialId) };
+    const revokedById = effectiveCredentialId ? envRevoked.has(effectiveCredentialId) : false;
+    const revokedByIndex = effectiveStatusIndex ? envRevokedIndexes.has(effectiveStatusIndex) : false;
+    return { ok: true, revoked: revokedById || revokedByIndex };
   }
 
   // optional http mode scaffold
@@ -67,7 +78,8 @@ export async function checkCredentialRevocation(
     if (!effectiveCredentialId) return { ok: false, reason: "credential_status_unavailable" };
     // local list still applies as immediate deny list
     if (envRevoked.has(effectiveCredentialId)) return { ok: true, revoked: true };
-    return checkHttpStatus(effectiveCredentialId);
+    if (effectiveStatusIndex && envRevokedIndexes.has(effectiveStatusIndex)) return { ok: true, revoked: true };
+    return checkHttpStatus(effectiveCredentialId, effectiveStatusIndex || undefined);
   }
 
   return { ok: false, reason: "credential_status_unavailable" };

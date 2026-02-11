@@ -147,7 +147,21 @@ async function run(): Promise<void> {
   const malformedStatusRes = await verifyRequest(malformedStatusReq, policy, "rp.example", resolveKey);
   assert.equal(malformedStatusRes.decisionCode, "DENY_STATUS_SOURCE_UNAVAILABLE");
 
-  // 10) unknown schema field
+  // 10) StatusList2021 index revoke (env mode)
+  process.env.CREDENTIAL_STATUS_MODE = "env";
+  process.env.REVOKED_STATUS_LIST_INDEXES = "42,99";
+  const revokedIndexReq = buildRequest();
+  revokedIndexReq.proofBundle.credentialStatus = {
+    type: "StatusList2021Entry",
+    statusListCredential: "https://status.example/list/1",
+    statusListIndex: "42",
+  };
+  const revokedIndexRes = await verifyRequest(revokedIndexReq, policy, "rp.example", resolveKey);
+  assert.equal(revokedIndexRes.decisionCode, "DENY_CREDENTIAL_REVOKED");
+  delete process.env.REVOKED_STATUS_LIST_INDEXES;
+  delete process.env.CREDENTIAL_STATUS_MODE;
+
+  // 11) unknown schema field
   const unknownFieldReq = {
     ...buildRequest(),
     sneaky: true,
@@ -155,7 +169,7 @@ async function run(): Promise<void> {
   const unknownField = await verifyRequest(unknownFieldReq, policy, "rp.example", resolveKey);
   assert.equal(unknownField.decisionCode, "DENY_SCHEMA_UNKNOWN_FIELD");
 
-  // 9) proof fatigue / re-auth required on repeated high-risk prompts
+  // 12) proof fatigue / re-auth required on repeated high-risk prompts
   process.env.PROOF_FATIGUE_WINDOW_SECONDS = "3600";
   process.env.PROOF_FATIGUE_MAX_HIGH_RISK_PROMPTS = "2";
   process.env.HIGH_RISK_PURPOSES = "age_gate_checkout";
@@ -174,7 +188,7 @@ async function run(): Promise<void> {
   const reauth = await verifyRequest(reauthReq, policy, "rp.example", resolveKey);
   assert.equal(reauth.decision, "ALLOW");
 
-  // 10) strict re-auth evidence mode (webauthn scaffold)
+  // 13) strict re-auth evidence mode (webauthn scaffold)
   process.env.REQUIRE_STRONG_REAUTH = "1";
   process.env.WEBAUTHN_ASSERTION_ALLOWLIST = "assert-ok-1";
   resetProofFatigue();
@@ -196,7 +210,7 @@ async function run(): Promise<void> {
   delete process.env.REQUIRE_STRONG_REAUTH;
   delete process.env.WEBAUTHN_ASSERTION_ALLOWLIST;
 
-  // 11) rate limit burst
+  // 14) rate limit burst
   resetRateLimiter();
   let rateLimited = false;
   for (let i = 0; i < 20; i++) {
