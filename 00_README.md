@@ -66,6 +66,7 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `41_Localhost_Test_Quickstart.md` — run/test instructions for local verifier service
 - `42_Pilot_Critical_Config.md` — required env config for protected pilot operation
 - `43_Pilot_Next_Steps_Plan.md` — immediate pilot hardening/evidence/execution plan
+- `44_Evidence_Runbook.md` — reproducible scenario runbook for pilot evidence (B1)
 - `src/api/metrics.ts` — in-service counters for basic KPI telemetry (`GET /metrics`)
 - `src/api/eventLog.ts` + `src/api/kpi.ts` — structured audit events and derived KPI snapshot (`GET /kpi`)
 - `src/api/auditVerify.ts` — audit hash-chain integrity verification (`GET /audit/verify`)

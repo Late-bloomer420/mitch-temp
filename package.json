@@ -6,6 +6,7 @@
   "scripts": {
     "compile": "tsc",
     "test": "npm run compile && node dist/tests/core.js && node dist/tests/auth.js",
+    "evidence": "npm run compile && node dist/tests/evidence.js",
     "start": "node dist/server.js",
     "dev": "npm run compile && node dist/server.js"
   },
