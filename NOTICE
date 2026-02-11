@@ -1,0 +1,10 @@
+miTch
+
+Copyright (c) 2026 miTch contributors.
+
+This repository is licensed under the MIT License (see LICENSE).
+
+Project positioning:
+- miTch is a user-controlled proof/policy mediation layer.
+- miTch is not an identity issuer or centralized identity custodian.
+- Requesters should receive minimal proofs, not raw identity payloads.

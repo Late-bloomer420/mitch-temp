@@ -1,0 +1,15 @@
+# Global default owners
+* @Late-bloomer420
+
+# Core security- and policy-critical paths
+/src/api/ @Late-bloomer420
+/src/binding/ @Late-bloomer420
+/src/policy/ @Late-bloomer420
+/src/proof/ @Late-bloomer420
+/src/receipt/ @Late-bloomer420
+/src/types/ @Late-bloomer420
+
+# Governance and documentation
+/LICENSE @Late-bloomer420
+/SECURITY.md @Late-bloomer420
+/00_README.md @Late-bloomer420
