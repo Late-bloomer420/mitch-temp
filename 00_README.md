@@ -1,11 +1,15 @@
 # miTch — Context Pack (for AI + humans)
 
+> Note: `README.md` is the short human-facing overview.
+> This file (`00_README.md`) is the detailed project/context index.
+
 **Purpose:** This folder is a compact, high-signal context bundle for the *miTch* project (user-sovereign identity + authorization).
 It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or shared with collaborators without losing the core invariants.
 
 **Build date:** 2026-02-11 (Europe/Vienna)
 
 ## How to use
+- Quick overview: `README.md`
 - Start with: `01_Project_OnePager.md`
 - If the other system tends to hallucinate or “optimize UX by breaking privacy”, also paste:
   - `02_Principles_and_NonNegotiables.md`

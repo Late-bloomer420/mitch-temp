@@ -9,6 +9,7 @@ import { validateRequestShape } from "./schemaValidator";
 import { checkRateLimit } from "./rateLimiter";
 import { appendReceipt } from "../receipt/wormWriter";
 import { validateRequestSemantics } from "./requestGuards";
+import { shouldFailClosedOnStatusUnavailable } from "../config/revocation";
 
 const nonceStore = new InMemoryNonceStore();
 
@@ -73,6 +74,11 @@ export async function verifyRequest(
       if (crypto.reason === "unsupported_alg") return deny(request.requestId, "DENY_CRYPTO_UNSUPPORTED_ALG");
       if (crypto.reason === "revoked_key") return deny(request.requestId, "DENY_CRYPTO_KEY_STATUS_INVALID");
       if (crypto.reason === "missing_key") return deny(request.requestId, "DENY_CRYPTO_KEY_STATUS_INVALID");
+      if (crypto.reason === "status_unavailable") {
+        return shouldFailClosedOnStatusUnavailable(request.purpose)
+          ? deny(request.requestId, "DENY_CRYPTO_KEY_STATUS_INVALID")
+          : deny(request.requestId, "DENY_CRYPTO_VERIFY_FAILED");
+      }
       return deny(request.requestId, "DENY_CRYPTO_VERIFY_FAILED");
     }
 

@@ -1,10 +1,13 @@
 # miTch
-Privacy-First Personal Data Infrastructure
-CORE PRINCIPLES (DO NOT BREAK)
-• Data stays with the user
-• Access replaces ownership
-• AI is a local gatekeeper, not a data owner
-• Each layer knows only what it must
-• Only proofs or results leave the device
-• All access is purpose-, scope-, and time-limited
-• Trust is enforced by architecture, not promises
+
+Privacy-first proof and policy mediation for identity/authorization flows.
+
+## Start here
+- **Project index / context pack:** `00_README.md`
+- **Quick local run/test:** `41_Localhost_Test_Quickstart.md`
+- **Pilot next steps:** `43_Pilot_Next_Steps_Plan.md`
+
+## What miTch is (short)
+- User-controlled proof/policy layer (not an identity issuer)
+- Minimal disclosure by design
+- Fail-closed verification pipeline with auditable decisions

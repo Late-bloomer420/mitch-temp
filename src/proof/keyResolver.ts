@@ -1,4 +1,4 @@
-export type KeyStatus = "active" | "revoked" | "missing";
+export type KeyStatus = "active" | "revoked" | "missing" | "unavailable";
 
 export interface ResolvedKey {
   status: KeyStatus;

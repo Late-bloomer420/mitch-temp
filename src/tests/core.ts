@@ -96,6 +96,11 @@ async function run(): Promise<void> {
   const missing = await verifyRequest(buildRequest(), policy, "rp.example", missingResolver);
   assert.equal(missing.decisionCode, "DENY_CRYPTO_KEY_STATUS_INVALID");
 
+  // 7c) status unavailable (high-risk purpose fail-closed)
+  const unavailableResolver: ResolveKey = async () => ({ status: "unavailable" });
+  const unavailable = await verifyRequest(buildRequest(), policy, "rp.example", unavailableResolver);
+  assert.equal(unavailable.decisionCode, "DENY_CRYPTO_KEY_STATUS_INVALID");
+
   // 8) unknown schema field
   const unknownFieldReq = {
     ...buildRequest(),

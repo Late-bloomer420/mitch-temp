@@ -21,6 +21,7 @@ export async function verifyProofBundle(
 
   const key = await resolveKey(bundle.keyId);
   if (key.status === "revoked") return { ok: false, reason: "revoked_key" };
+  if (key.status === "unavailable") return { ok: false, reason: "status_unavailable" };
   if (key.status !== "active" || !key.publicKeyPem) return { ok: false, reason: "missing_key" };
 
   try {
