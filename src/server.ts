@@ -47,6 +47,18 @@ const server = createServer(async (req, res) => {
     return sendJson(res, 400, { error: "bad_request" }, correlationId);
   }
 
+  if (req.method === "GET" && req.url === "/") {
+    return sendJson(
+      res,
+      200,
+      {
+        service: "miTch verifier",
+        endpoints: ["GET /", "GET /health", "GET /metrics", "GET /test-request (LOCAL_TEST_KEYS=1)", "POST /verify"],
+      },
+      correlationId
+    );
+  }
+
   if (req.method === "GET" && req.url === "/health") {
     return sendJson(res, 200, { status: "ok" }, correlationId);
   }

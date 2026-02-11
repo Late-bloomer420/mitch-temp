@@ -12,6 +12,11 @@ npm start
 
 Server runs on `http://localhost:8080`.
 
+Open in browser:
+- `http://localhost:8080/` (service info)
+- `http://localhost:8080/health`
+- `http://localhost:8080/metrics`
+
 ## Health check
 ```powershell
 Invoke-WebRequest -UseBasicParsing http://localhost:8080/health | Select-Object -ExpandProperty Content
@@ -57,3 +62,4 @@ Expected: `DENY_BINDING_HASH_MISMATCH`
 ## Notes
 - `LOCAL_TEST_KEYS=1` enables local signed-request generation for HTTP ALLOW-path testing.
 - Disable it outside local/dev testing.
+- If you see `EADDRINUSE` on port 8080, another server is already running. Stop it or use a different `PORT`.
