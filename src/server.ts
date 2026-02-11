@@ -4,6 +4,8 @@ import { PolicyManifestV0 } from "./types/policy";
 import { ResolveKey } from "./proof/keyResolver";
 import { createSignedLocalRequest, localResolveKey } from "./api/testRequestFactory";
 import { getMetricsSnapshot, recordDecision, resetMetrics } from "./api/metrics";
+import { isAuthorized } from "./config/auth";
+import { envResolveKey } from "./proof/envKeyResolver";
 
 const PORT = Number(process.env.PORT ?? 8080);
 const RUNTIME_AUDIENCE = process.env.RUNTIME_AUDIENCE ?? "rp.example";
@@ -22,9 +24,7 @@ const defaultPolicy: PolicyManifestV0 = {
 };
 
 // TODO: replace with real key resolver + issuer status integration
-const resolveKey: ResolveKey = ALLOW_TEST_KEYS
-  ? localResolveKey
-  : async () => ({ status: "missing" });
+const resolveKey: ResolveKey = ALLOW_TEST_KEYS ? localResolveKey : envResolveKey;
 
 function sendJson(res: ServerResponse, statusCode: number, body: unknown, correlationId?: string): void {
   const json = JSON.stringify(body);
@@ -158,6 +158,10 @@ const server = createServer(async (req, res) => {
   }
 
   if (req.method === "POST" && req.url === "/verify") {
+    if (!isAuthorized(req.headers.authorization?.toString())) {
+      return sendJson(res, 401, { error: "unauthorized" }, correlationId);
+    }
+
     try {
       const raw = await readBody(req);
       const parsed: unknown = raw ? JSON.parse(raw) : {};

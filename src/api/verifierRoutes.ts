@@ -8,6 +8,7 @@ import { ResolveKey } from "../proof/keyResolver";
 import { validateRequestShape } from "./schemaValidator";
 import { checkRateLimit } from "./rateLimiter";
 import { appendReceipt } from "../receipt/wormWriter";
+import { validateRequestSemantics } from "./requestGuards";
 
 const nonceStore = new InMemoryNonceStore();
 
@@ -45,6 +46,10 @@ export async function verifyRequest(
     const schema = validateRequestShape(requestInput);
     if (!schema.ok) return deny(requestId, schema.code);
     const request = schema.value;
+
+    // semantic guard gate
+    const sem = validateRequestSemantics(request);
+    if (!sem.ok) return deny(request.requestId, sem.code);
 
     // rate-limit gate
     const allowed = checkRateLimit(request.rp.id, { windowSeconds: 60, maxRequestsPerRequester: 10 });

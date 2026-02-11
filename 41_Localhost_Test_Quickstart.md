@@ -8,6 +8,8 @@ npm run compile
 $env:RUNTIME_AUDIENCE="rp.example"
 $env:LOCAL_TEST_KEYS="1"
 $env:ALLOW_DEV_RESET="1"
+$env:AUTH_TOKEN_REQUIRED="1"
+$env:AUTH_TOKEN="dev-secret"
 npm start
 ```
 
@@ -51,7 +53,7 @@ $sample = Invoke-WebRequest -UseBasicParsing http://localhost:8080/test-request 
 Invoke-WebRequest -UseBasicParsing http://localhost:8080/verify `
   -Method POST `
   -ContentType "application/json" `
-  -Headers @{"x-correlation-id"="local-test-allow-1"} `
+  -Headers @{"x-correlation-id"="local-test-allow-1";"Authorization"="Bearer dev-secret"} `
   -Body $sample | Select-Object -ExpandProperty Content
 ```
 
@@ -66,7 +68,7 @@ $bad = $obj | ConvertTo-Json -Depth 8
 Invoke-WebRequest -UseBasicParsing http://localhost:8080/verify `
   -Method POST `
   -ContentType "application/json" `
-  -Headers @{"x-correlation-id"="local-test-deny-1"} `
+  -Headers @{"x-correlation-id"="local-test-deny-1";"Authorization"="Bearer dev-secret"} `
   -Body $bad | Select-Object -ExpandProperty Content
 ```
 

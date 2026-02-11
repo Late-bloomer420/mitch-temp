@@ -60,6 +60,7 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `39_Pilot_KPI_Dashboard_Template.md` — weekly KPI reporting template for pilot operations
 - `40_KPI_Definitions_and_Data_Sources.md` — formulas, telemetry sources, and KPI ownership
 - `41_Localhost_Test_Quickstart.md` — run/test instructions for local verifier service
+- `42_Pilot_Critical_Config.md` — required env config for protected pilot operation
 - `src/api/metrics.ts` — in-service counters for basic KPI telemetry (`GET /metrics`)
 - `LICENSE` — MIT open-source license
 - `NOTICE` — ownership and positioning notice
