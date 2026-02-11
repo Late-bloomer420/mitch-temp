@@ -6,18 +6,22 @@ import { evaluatePolicy } from "../policy/evaluator";
 import { verifyProofBundle } from "../proof/verifier";
 import { ResolveKey } from "../proof/keyResolver";
 import { validateRequestShape } from "./schemaValidator";
+import { checkRateLimit } from "./rateLimiter";
+import { appendReceipt } from "../receipt/wormWriter";
 
 const nonceStore = new InMemoryNonceStore();
 
 function deny(requestId: string, decisionCode: string): VerificationResponseV0 {
+  const verifiedAt = new Date().toISOString();
+  const receiptRef = appendReceipt({ requestId, decision: "DENY", decisionCode, verifiedAt });
   return {
     version: "v0",
     requestId,
     decision: "DENY",
     decisionCode,
     claimsSatisfied: [],
-    receiptRef: "aqdr:pending",
-    verifiedAt: new Date().toISOString(),
+    receiptRef,
+    verifiedAt,
   };
 }
 
@@ -42,6 +46,10 @@ export async function verifyRequest(
     if (!schema.ok) return deny(requestId, schema.code);
     const request = schema.value;
 
+    // rate-limit gate
+    const allowed = checkRateLimit(request.rp.id, { windowSeconds: 60, maxRequestsPerRequester: 10 });
+    if (!allowed) return deny(request.requestId, "DENY_RATE_LIMIT_EXCEEDED");
+
     // binding gate
     const binding = await validateBinding(request, runtimeAudience, nonceStore, {
       clockSkewSeconds: 90,
@@ -62,14 +70,22 @@ export async function verifyRequest(
       return deny(request.requestId, "DENY_CRYPTO_VERIFY_FAILED");
     }
 
+    const verifiedAt = new Date().toISOString();
+    const receiptRef = appendReceipt({
+      requestId: request.requestId,
+      decision: "ALLOW",
+      decisionCode: "ALLOW_MINIMAL_PROOF_VALID",
+      verifiedAt,
+    });
+
     return {
       version: "v0",
       requestId: request.requestId,
       decision: "ALLOW",
       decisionCode: "ALLOW_MINIMAL_PROOF_VALID",
       claimsSatisfied: decision.claimsSatisfied,
-      receiptRef: "aqdr:pending",
-      verifiedAt: new Date().toISOString(),
+      receiptRef,
+      verifiedAt,
     };
   } catch {
     return deny(requestId, "DENY_INTERNAL_SAFE_FAILURE");

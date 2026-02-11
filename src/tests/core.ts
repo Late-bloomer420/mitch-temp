@@ -99,6 +99,17 @@ async function run(): Promise<void> {
   const unknownField = await verifyRequest(unknownFieldReq, policy, "rp.example", resolveKey);
   assert.equal(unknownField.decisionCode, "DENY_SCHEMA_UNKNOWN_FIELD");
 
+  // 9) rate limit burst
+  let rateLimited = false;
+  for (let i = 0; i < 20; i++) {
+    const res = await verifyRequest(buildRequest(), policy, "rp.example", resolveKey);
+    if (res.decisionCode === "DENY_RATE_LIMIT_EXCEEDED") {
+      rateLimited = true;
+      break;
+    }
+  }
+  assert.equal(rateLimited, true);
+
   console.log("core tests passed");
 }
 
