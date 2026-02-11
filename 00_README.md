@@ -125,6 +125,7 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `97_WebAuthn_Config_Health_Guardrail.md` - KPI/check guardrail for strong re-auth config health
 - `98_WebAuthn_Native_Mode_Usage_Visibility.md` - KPI/dashboard/check visibility for native mode posture
 - `99_WebAuthn_Allowlist_Mode_Drift_Warning.md` - warning signal when strong re-auth still runs allowlist verification mode
+- `100_Security_Profile_Score_KPI_v1.md` - compact 0-100 security posture score in KPI/dashboard/checks
 - `src/tools/kpiCheckCli.ts` - CLI check for KPI thresholds (`npm run kpi:check`)
 - `src/api/metrics.ts` - in-service counters for basic KPI telemetry (`GET /metrics`)
 - `src/api/eventLog.ts` + `src/api/kpi.ts` - structured audit events and derived KPI snapshot (`GET /kpi`)

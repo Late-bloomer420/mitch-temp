@@ -42,6 +42,7 @@ function run(): void {
   const estimatedCostPerVerification = Number(kpi.estimated_cost_per_verification_eur ?? 0);
   const cryptoAllowedAlgsCount = Number(kpi.crypto_allowed_algs_count ?? 0);
   const estimatedMonthlyRunCost = Number(kpi.estimated_monthly_run_cost_eur ?? 0);
+  const securityProfileScore = Number(kpi.security_profile_score ?? 0);
   const reauthStrongEnabled = Number(kpi.reauth_strong_enabled ?? 0);
   const webauthnModeCode = Number(kpi.webauthn_verify_mode_code ?? 0);
   const webauthnNativeModeEnabled = Number(kpi.webauthn_native_mode_enabled ?? 0);
@@ -62,6 +63,12 @@ function run(): void {
 
   if (falseAllowTotal > 0) {
     issues.push(`CRITICAL: false_allow_total=${falseAllowTotal} > 0`);
+  }
+
+  if (securityProfileScore < 60) {
+    issues.push(`CRITICAL: security_profile_score=${securityProfileScore} < 60`);
+  } else if (securityProfileScore < 80) {
+    issues.push(`WARNING: security_profile_score=${securityProfileScore} < 80`);
   }
 
   if (reauthStrongEnabled === 1 && webauthnModeCode > 0 && webauthnSecretConfigValid === 0) {
@@ -127,6 +134,7 @@ function run(): void {
       webauthn_allowlist_mode_enabled: webauthnAllowlistModeEnabled,
       webauthn_secret_config_valid: webauthnSecretConfigValid,
       estimated_monthly_run_cost_eur: estimatedMonthlyRunCost,
+      security_profile_score: securityProfileScore,
     },
     issues,
     ok: issues.length === 0,

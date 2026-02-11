@@ -39,6 +39,15 @@ Define simple, actionable alert thresholds for pilot operations.
   1. Move verification mode to `signed` or `native`
   2. Keep allowlist mode only for explicit compatibility windows
 
+### 0e) Security profile score degradation
+- Signal: `security_profile_score`
+- Warning: `< 80`
+- Critical: `< 60`
+- Action:
+  1. Investigate contributing penalties immediately
+  2. Restore strong-mode and resolver health posture
+  3. Pause risky rollout if critical threshold is breached
+
 ### 1) Status source degradation
 - Signal: `deny_status_source_unavailable_rate`
 - Warning: `> 0.05` over last review window

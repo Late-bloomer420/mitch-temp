@@ -85,6 +85,17 @@ export function getKpiSnapshot(): Record<string, number> {
   const estimatedMonthlyRunCost =
     estimatedFixedMonthlyCost + estimatedCostPerVerification * Math.max(0, estimatedMonthlyVerificationVolume);
 
+  // compact security posture score (0-100), deny-biased weighting
+  let securityProfileScore = 100;
+  if (falseAllows > 0) securityProfileScore -= 60;
+  if (reauthStrongEnabled !== 1) securityProfileScore -= 10;
+  if (webauthnModeCode === 0) securityProfileScore -= 10;
+  if (webauthnSecretConfigValid !== 1 && webauthnModeCode > 0) securityProfileScore -= 20;
+  if (denyResolverQuorumFailed > 0) securityProfileScore -= 10;
+  if (denyStatusSourceUnavailable > 0) securityProfileScore -= 5;
+  if (resolver.resolver_inconsistent_responses_total > 0) securityProfileScore -= 5;
+  securityProfileScore = Math.max(0, Math.min(100, securityProfileScore));
+
   return {
     decisions_total: total,
     allow_total: allows,
@@ -115,6 +126,7 @@ export function getKpiSnapshot(): Record<string, number> {
     estimated_monthly_verification_volume: Math.max(0, estimatedMonthlyVerificationVolume),
     estimated_fixed_monthly_cost_eur: estimatedFixedMonthlyCost,
     estimated_monthly_run_cost_eur: estimatedMonthlyRunCost,
+    security_profile_score: securityProfileScore,
     latency_p50_ms: percentile(latencies, 50),
     latency_p95_ms: percentile(latencies, 95),
   };
