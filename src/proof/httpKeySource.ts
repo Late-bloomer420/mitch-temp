@@ -9,6 +9,8 @@ const resolverTelemetry = {
   inconsistentResponses: 0,
 };
 
+const lastResolverOutcomeByKey = new Map<string, "ok" | "missing" | "quorum_failed">();
+
 function fetchJson(urlStr: string, timeoutMs: number): Promise<Record<string, string> | null> {
   return new Promise((resolve) => {
     try {
@@ -77,9 +79,18 @@ export class HttpKeySource implements KeySource {
     }
 
     const ok = winner && winnerCount >= this.quorum;
-    if (!ok) resolverTelemetry.quorumFailures += 1;
+    if (!ok) {
+      if (counts.size > 0) {
+        resolverTelemetry.quorumFailures += 1;
+        lastResolverOutcomeByKey.set(keyId, "quorum_failed");
+      } else {
+        lastResolverOutcomeByKey.set(keyId, "missing");
+      }
+      return null;
+    }
 
-    return ok ? winner : null;
+    lastResolverOutcomeByKey.set(keyId, "ok");
+    return winner;
   }
 }
 
@@ -93,4 +104,8 @@ export function getResolverTelemetry(): {
     resolver_quorum_failures_total: resolverTelemetry.quorumFailures,
     resolver_inconsistent_responses_total: resolverTelemetry.inconsistentResponses,
   };
+}
+
+export function getLastResolverOutcome(keyId: string): "ok" | "missing" | "quorum_failed" | null {
+  return lastResolverOutcomeByKey.get(keyId) ?? null;
 }

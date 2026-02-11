@@ -104,7 +104,13 @@ async function run(): Promise<void> {
   const missing = await verifyRequest(buildRequest(), policy, "rp.example", missingResolver);
   assert.equal(missing.decisionCode, "DENY_CRYPTO_KEY_STATUS_INVALID");
 
+  // 7bb) resolver quorum failed
+  const quorumFailResolver: ResolveKey = async () => ({ status: "resolver_quorum_failed" });
+  const quorumFail = await verifyRequest(buildRequest(), policy, "rp.example", quorumFailResolver);
+  assert.equal(quorumFail.decisionCode, "DENY_RESOLVER_QUORUM_FAILED");
+
   // 7c) status unavailable (high-risk purpose fail-closed)
+  resetRateLimiter();
   const unavailableResolver: ResolveKey = async () => ({ status: "unavailable" });
   const unavailable = await verifyRequest(buildRequest(), policy, "rp.example", unavailableResolver);
   assert.equal(unavailable.decisionCode, "DENY_STATUS_SOURCE_UNAVAILABLE");

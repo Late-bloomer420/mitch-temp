@@ -31,6 +31,7 @@ function run(): void {
   const cacheStores = Number(kpi.revoked_cache_store_total ?? 0);
   const revokedTotal = Number(kpi.deny_credential_revoked_total ?? 0);
   const reauthInvalidTotal = Number(kpi.deny_reauth_proof_invalid_total ?? 0);
+  const denyResolverQuorumFailed = Number(kpi.deny_resolver_quorum_failed_total ?? 0);
   const resolverQuorumFailures = Number(kpi.resolver_quorum_failures_total ?? 0);
   const resolverInconsistent = Number(kpi.resolver_inconsistent_responses_total ?? 0);
 
@@ -75,6 +76,7 @@ function run(): void {
       revoked_cache_store_total: cacheStores,
       deny_credential_revoked_total: revokedTotal,
       deny_reauth_proof_invalid_total: reauthInvalidTotal,
+      deny_resolver_quorum_failed_total: denyResolverQuorumFailed,
       resolver_quorum_failures_total: resolverQuorumFailures,
       resolver_inconsistent_responses_total: resolverInconsistent,
     },

@@ -44,6 +44,7 @@ Each deny result must provide:
 - `DENY_JURISDICTION_INCOMPATIBLE` - requester/runtime jurisdiction mismatch or missing jurisdiction when strict matching is enabled
 - `DENY_CREDENTIAL_REVOKED` - credential identifier or status-list index is listed as revoked by configured status source
 - `DENY_CREDENTIAL_STATUS_INVALID` - malformed or unsafe credential status reference (e.g., invalid URL/index)
+- `DENY_RESOLVER_QUORUM_FAILED` - multi-resolver key lookup returned inconsistent/no-quorum result
 - `DENY_STATUS_SOURCE_UNAVAILABLE` - key/credential status source unavailable or timed out
 - `DENY_INTERNAL_SAFE_FAILURE` - internal error handled fail-closed
 
