@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["version", "requestId", "decision", "decisionCode", "claimsSatisfied", "receiptRef", "verifiedAt"],
+  "properties": {
+    "version": { "const": "v0" },
+    "requestId": { "type": "string" },
+    "decision": { "enum": ["ALLOW", "DENY"] },
+    "decisionCode": { "type": "string" },
+    "claimsSatisfied": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "value"],
+        "properties": {
+          "name": { "type": "string" },
+          "value": {}
+        },
+        "additionalProperties": false
+      }
+    },
+    "receiptRef": { "type": "string" },
+    "verifiedAt": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

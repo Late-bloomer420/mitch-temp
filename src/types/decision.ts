@@ -1,0 +1,27 @@
+export type DenyCode =
+  | "DENY_SCHEMA_MISSING_FIELD"
+  | "DENY_SCHEMA_UNKNOWN_FIELD"
+  | "DENY_SCHEMA_TYPE_MISMATCH"
+  | "DENY_POLICY_UNSUPPORTED_VERSION"
+  | "DENY_POLICY_UNKNOWN_PREDICATE"
+  | "DENY_POLICY_MINIMIZATION_VIOLATION"
+  | "DENY_POLICY_PURPOSE_MISMATCH"
+  | "DENY_BINDING_NONCE_REPLAY"
+  | "DENY_BINDING_HASH_MISMATCH"
+  | "DENY_BINDING_AUDIENCE_MISMATCH"
+  | "DENY_BINDING_EXPIRED"
+  | "DENY_CRYPTO_VERIFY_FAILED"
+  | "DENY_CRYPTO_UNSUPPORTED_ALG"
+  | "DENY_CRYPTO_KEY_STATUS_INVALID"
+  | "DENY_RATE_LIMIT_EXCEEDED"
+  | "DENY_INTERNAL_SAFE_FAILURE";
+
+export type AllowCode = "ALLOW_MINIMAL_PROOF_VALID";
+
+export type DecisionCode = DenyCode | AllowCode;
+
+export interface DecisionResult {
+  decision: "ALLOW" | "DENY";
+  decisionCode: DecisionCode;
+  claimsSatisfied: Array<{ name: string; value: string | number | boolean }>;
+}
