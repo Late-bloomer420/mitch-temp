@@ -84,7 +84,7 @@ It is designed to be pasted into other AI systems (Gemini, Claude, AI Studio) or
 - `58_Revocation_Baseline_v1.md` - credential/key revocation baseline and next-step plan
 - `59_Supply_Chain_Hardening_v1.md` - baseline + near-term controls against dependency compromise
 - `60_Legal_and_Jurisdiction_Security_Strategy.md` - backdoor pressure and jurisdiction conflict strategy
-- `.github/workflows/ci-security.yml` - merge-gate CI for tests, evidence, swarm test, and dependency audit
+- `.github/workflows/ci-security.yml` - merge-gate CI for tests, evidence, KPI threshold check, swarm test, and dependency audit
 - `61_Jurisdiction_Compatibility_Gate_v1.md` - strict jurisdiction mismatch deny baseline
 - `62_Revocation_Status_Resolver_v2_Scaffold.md` - env/http credential status resolver scaffold and fail-closed mapping
 - `63_Deny_Code_Credential_Revoked.md` - dedicated deny code for credential-level revocation outcomes

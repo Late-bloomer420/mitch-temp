@@ -32,5 +32,8 @@ jobs:
       - name: Evidence run
         run: npm run evidence
 
+      - name: KPI threshold check
+        run: npm run kpi:check
+
       - name: Dependency security gate
         run: npm run security:deps
