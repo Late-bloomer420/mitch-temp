@@ -3,6 +3,8 @@ import { getKpiSnapshot } from "../api/kpi";
 interface Thresholds {
   warnStatusUnavailableRate: number;
   critStatusUnavailableRate: number;
+  warnResolverInconsistentTotal: number;
+  critResolverInconsistentTotal: number;
   failOnWarning: boolean;
 }
 
@@ -10,6 +12,8 @@ function getThresholds(): Thresholds {
   return {
     warnStatusUnavailableRate: Number(process.env.KPI_WARN_STATUS_UNAVAILABLE_RATE ?? 0.05),
     critStatusUnavailableRate: Number(process.env.KPI_CRIT_STATUS_UNAVAILABLE_RATE ?? 0.2),
+    warnResolverInconsistentTotal: Number(process.env.KPI_WARN_RESOLVER_INCONSISTENT_TOTAL ?? 5),
+    critResolverInconsistentTotal: Number(process.env.KPI_CRIT_RESOLVER_INCONSISTENT_TOTAL ?? 20),
     failOnWarning: process.env.KPI_FAIL_ON_WARNING === "1",
   };
 }
@@ -36,6 +40,16 @@ function run(): void {
 
   if (cacheStores > 0 && cacheHits > cacheStores * 10) {
     issues.push(`WARNING: revoked cache hit/store skew high (${cacheHits}/${cacheStores})`);
+  }
+
+  if (resolverInconsistent > t.critResolverInconsistentTotal) {
+    issues.push(
+      `CRITICAL: resolver_inconsistent_responses_total=${resolverInconsistent} > ${t.critResolverInconsistentTotal}`
+    );
+  } else if (resolverInconsistent > t.warnResolverInconsistentTotal) {
+    issues.push(
+      `WARNING: resolver_inconsistent_responses_total=${resolverInconsistent} > ${t.warnResolverInconsistentTotal}`
+    );
   }
 
   const output = {

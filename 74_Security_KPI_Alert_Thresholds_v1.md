@@ -43,6 +43,15 @@ Define simple, actionable alert thresholds for pilot operations.
   2. Validate strict-mode metadata generation in clients
   3. Review recent re-auth policy/config changes
 
+### 5) Resolver inconsistency drift
+- Signal: `resolver_inconsistent_responses_total`
+- Warning: `> KPI_WARN_RESOLVER_INCONSISTENT_TOTAL` (default 5)
+- Critical: `> KPI_CRIT_RESOLVER_INCONSISTENT_TOTAL` (default 20)
+- Action:
+  1. Verify resolver endpoint integrity and network path
+  2. Check for targeted mismatch/eclipsing conditions
+  3. Temporarily increase quorum strictness if needed
+
 ## Operational notes
 - Evaluate thresholds per rolling window (e.g., 15-60 min) rather than raw lifetime totals.
 - `kpi:check` behavior can be tuned with `KPI_FAIL_ON_WARNING` (default soft-fail on warnings).
