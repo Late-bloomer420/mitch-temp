@@ -42,6 +42,7 @@ Each deny result must provide:
 - `DENY_REAUTH_REQUIRED` - high-risk prompt frequency threshold reached; recent re-auth required
 - `DENY_JURISDICTION_INCOMPATIBLE` - requester/runtime jurisdiction mismatch or missing jurisdiction when strict matching is enabled
 - `DENY_CREDENTIAL_REVOKED` - credential identifier is listed as revoked by configured status source
+- `DENY_STATUS_SOURCE_UNAVAILABLE` - key/credential status source unavailable or timed out
 - `DENY_INTERNAL_SAFE_FAILURE` - internal error handled fail-closed
 
 ---

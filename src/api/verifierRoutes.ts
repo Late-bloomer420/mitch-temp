@@ -95,8 +95,8 @@ export async function verifyRequest(
       if (crypto.reason === "missing_key") return deny(request.requestId, "DENY_CRYPTO_KEY_STATUS_INVALID");
       if (crypto.reason === "status_unavailable" || crypto.reason === "credential_status_unavailable") {
         return shouldFailClosedOnStatusUnavailable(request.purpose)
-          ? deny(request.requestId, "DENY_CRYPTO_KEY_STATUS_INVALID")
-          : deny(request.requestId, "DENY_CRYPTO_VERIFY_FAILED");
+          ? deny(request.requestId, "DENY_STATUS_SOURCE_UNAVAILABLE")
+          : deny(request.requestId, "DENY_STATUS_SOURCE_UNAVAILABLE");
       }
       return deny(request.requestId, "DENY_CRYPTO_VERIFY_FAILED");
     }

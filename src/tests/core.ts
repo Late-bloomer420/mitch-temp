@@ -104,7 +104,7 @@ async function run(): Promise<void> {
   // 7c) status unavailable (high-risk purpose fail-closed)
   const unavailableResolver: ResolveKey = async () => ({ status: "unavailable" });
   const unavailable = await verifyRequest(buildRequest(), policy, "rp.example", unavailableResolver);
-  assert.equal(unavailable.decisionCode, "DENY_CRYPTO_KEY_STATUS_INVALID");
+  assert.equal(unavailable.decisionCode, "DENY_STATUS_SOURCE_UNAVAILABLE");
 
   // 7d) revoked credential id
   resetRateLimiter();
@@ -122,7 +122,7 @@ async function run(): Promise<void> {
   const statusUnavailableReq = buildRequest();
   statusUnavailableReq.proofBundle.credentialId = "cred-check-1";
   const statusUnavailableRes = await verifyRequest(statusUnavailableReq, policy, "rp.example", resolveKey);
-  assert.equal(statusUnavailableRes.decisionCode, "DENY_CRYPTO_KEY_STATUS_INVALID");
+  assert.equal(statusUnavailableRes.decisionCode, "DENY_STATUS_SOURCE_UNAVAILABLE");
   delete process.env.CREDENTIAL_STATUS_MODE;
   delete process.env.CREDENTIAL_STATUS_URL;
   delete process.env.CREDENTIAL_STATUS_TIMEOUT_MS;
