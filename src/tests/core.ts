@@ -167,6 +167,32 @@ async function run(): Promise<void> {
   delete process.env.CREDENTIAL_STATUS_URL;
   delete process.env.CREDENTIAL_STATUS_TIMEOUT_MS;
 
+  // 7h) oversized status provider response must fail closed
+  const oversizedServer = createServer((_, res) => {
+    const payload = JSON.stringify({ revokedCredentialIds: ["x".repeat(5000)] });
+    res.writeHead(200, {
+      "Content-Type": "application/json",
+      "Content-Length": Buffer.byteLength(payload),
+    });
+    res.end(payload);
+  });
+  await new Promise<void>((resolve) => oversizedServer.listen(18083, resolve));
+
+  process.env.CREDENTIAL_STATUS_MODE = "http";
+  process.env.CREDENTIAL_STATUS_URL = "http://127.0.0.1:18083/revoked";
+  process.env.CREDENTIAL_STATUS_TIMEOUT_MS = "200";
+  process.env.CREDENTIAL_STATUS_MAX_BYTES = "256";
+  const oversizedReq = buildRequest();
+  oversizedReq.proofBundle.credentialId = "cred-check-4";
+  const oversizedRes = await verifyRequest(oversizedReq, policy, "rp.example", resolveKey);
+  assert.equal(oversizedRes.decisionCode, "DENY_STATUS_SOURCE_UNAVAILABLE");
+  await new Promise<void>((resolve, reject) => oversizedServer.close((err) => (err ? reject(err) : resolve())));
+
+  delete process.env.CREDENTIAL_STATUS_MODE;
+  delete process.env.CREDENTIAL_STATUS_URL;
+  delete process.env.CREDENTIAL_STATUS_TIMEOUT_MS;
+  delete process.env.CREDENTIAL_STATUS_MAX_BYTES;
+
   // 8) jurisdiction incompatibility
   process.env.REQUIRE_JURISDICTION_MATCH = "1";
   process.env.RUNTIME_JURISDICTION = "EU";

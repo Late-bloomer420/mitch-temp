@@ -32,7 +32,19 @@ async function checkHttpStatus(
     if (!contentType.includes("application/json")) {
       return { ok: false, reason: "credential_status_unavailable" };
     }
-    const data = (await res.json()) as { revokedCredentialIds?: unknown; revokedIndexes?: unknown };
+
+    const maxBytes = Number(process.env.CREDENTIAL_STATUS_MAX_BYTES ?? 65536);
+    const contentLength = Number(res.headers.get("content-length") ?? "0");
+    if (contentLength > 0 && contentLength > maxBytes) {
+      return { ok: false, reason: "credential_status_unavailable" };
+    }
+
+    const raw = await res.text();
+    if (Buffer.byteLength(raw, "utf8") > maxBytes) {
+      return { ok: false, reason: "credential_status_unavailable" };
+    }
+
+    const data = JSON.parse(raw) as { revokedCredentialIds?: unknown; revokedIndexes?: unknown };
 
     const hasRevokedIds = Object.prototype.hasOwnProperty.call(data, "revokedCredentialIds");
     const hasRevokedIndexes = Object.prototype.hasOwnProperty.call(data, "revokedIndexes");
