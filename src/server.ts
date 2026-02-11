@@ -2,6 +2,7 @@ import { createServer, IncomingMessage, ServerResponse } from "http";
 import { verifyRequest } from "./api/verifierRoutes";
 import { PolicyManifestV0 } from "./types/policy";
 import { ResolveKey } from "./proof/keyResolver";
+import { createSignedLocalRequest, localResolveKey } from "./api/testRequestFactory";
 
 const PORT = Number(process.env.PORT ?? 8080);
 const RUNTIME_AUDIENCE = process.env.RUNTIME_AUDIENCE ?? "rp.example";
@@ -15,7 +16,9 @@ const defaultPolicy: PolicyManifestV0 = {
 };
 
 // TODO: replace with real key resolver + issuer status integration
-const resolveKey: ResolveKey = async () => ({ status: "missing" });
+const resolveKey: ResolveKey = process.env.LOCAL_TEST_KEYS === "1"
+  ? localResolveKey
+  : async () => ({ status: "missing" });
 
 function sendJson(res: ServerResponse, statusCode: number, body: unknown, correlationId?: string): void {
   const json = JSON.stringify(body);
@@ -45,6 +48,14 @@ const server = createServer(async (req, res) => {
 
   if (req.method === "GET" && req.url === "/health") {
     return sendJson(res, 200, { status: "ok" }, correlationId);
+  }
+
+  if (req.method === "GET" && req.url === "/test-request") {
+    if (process.env.LOCAL_TEST_KEYS !== "1") {
+      return sendJson(res, 403, { error: "test_keys_disabled" }, correlationId);
+    }
+    const sample = createSignedLocalRequest(RUNTIME_AUDIENCE);
+    return sendJson(res, 200, sample, correlationId);
   }
 
   if (req.method === "POST" && req.url === "/verify") {
